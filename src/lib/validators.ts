@@ -27,7 +27,7 @@ export const matrimonioSchema = z.object({
   fechaCelebracion: z.string().min(1, 'La fecha de celebración es requerida'),
   lugarCelebracion: z.string().min(2, 'El lugar de celebración es requerido'),
   regimenPatrimonial: z.enum(['SEPARACION_BIENES', 'SOCIEDAD_CONYUGAL'], {
-    errorMap: () => ({ message: 'Seleccione un régimen patrimonial' }),
+    message: 'Seleccione un régimen patrimonial',
   }),
   tieneHijos: z.boolean(),
   numeroHijos: z.number().int().min(0).optional(),
