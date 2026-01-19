@@ -10,7 +10,7 @@ export function Header() {
             {/* Escudo de Chihuahua */}
             <div className="flex-shrink-0">
               <img
-                src="https://chihuahua.gob.mx/sites/all/themes/Gobierno/images/logo.png"
+                src="/logos/escudo-chihuahua.svg"
                 alt="Escudo del Estado de Chihuahua"
                 className="h-16 w-auto"
               />

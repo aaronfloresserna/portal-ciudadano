@@ -55,7 +55,7 @@ export default function RegistroPage() {
       {/* Logo y título */}
       <div className="absolute top-8 left-1/2 transform -translate-x-1/2 flex flex-col items-center">
         <img
-          src="https://chihuahua.gob.mx/sites/all/themes/Gobierno/images/logo.png"
+          src="/logos/escudo-chihuahua.svg"
           alt="Escudo del Estado de Chihuahua"
           className="h-20 w-auto mb-4"
         />
