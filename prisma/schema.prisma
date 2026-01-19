@@ -1,0 +1,71 @@
+// Portal Ciudadano - MVP Schema
+// Base de datos para trámite de Divorcio Voluntario
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Usuario {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String   // Hash bcrypt
+  nombre    String
+  telefono  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  tramites  Tramite[]
+
+  @@map("usuarios")
+}
+
+model Tramite {
+  id          String   @id @default(cuid())
+  usuarioId   String
+  tipo        String   @default("DIVORCIO_VOLUNTARIO")
+  estado      String   @default("BORRADOR") // BORRADOR, COMPLETADO
+  pasoActual  Int      @default(1) // 1-5
+  datos       Json     @default("{}") // Almacenar todos los datos del formulario
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  usuario     Usuario     @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  documentos  Documento[]
+  expediente  Expediente?
+
+  @@index([usuarioId])
+  @@index([estado])
+  @@map("tramites")
+}
+
+model Documento {
+  id            String   @id @default(cuid())
+  tramiteId     String
+  tipo          String   // INE_CONYUGE_1, INE_CONYUGE_2, ACTA_MATRIMONIO, CONVENIO
+  nombreArchivo String
+  path          String
+  mimeType      String
+  size          Int
+  createdAt     DateTime @default(now())
+
+  tramite       Tramite  @relation(fields: [tramiteId], references: [id], onDelete: Cascade)
+
+  @@index([tramiteId])
+  @@map("documentos")
+}
+
+model Expediente {
+  id          String   @id @default(cuid())
+  tramiteId   String   @unique
+  pdfPath     String
+  hashSha256  String
+  generatedAt DateTime @default(now())
+
+  tramite     Tramite  @relation(fields: [tramiteId], references: [id], onDelete: Cascade)
+
+  @@map("expedientes")
+}
