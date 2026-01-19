@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { useAuthStore } from '@/stores/authStore'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Header } from '@/components/layout/Header'
 
 export default function DashboardPage() {
   const router = useRouter()
@@ -31,25 +32,23 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       {/* Header */}
-      <header className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+      <Header />
+
+      {/* User Info Bar */}
+      <div className="bg-gray-50 border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
           <div className="flex justify-between items-center">
-            <h1 className="text-2xl font-bold text-gray-900">
-              Portal Ciudadano
-            </h1>
-            <div className="flex items-center gap-4">
-              <span className="text-sm text-gray-600">
-                Hola, {usuario.nombre}
-              </span>
-              <Button onClick={handleLogout} variant="outline" size="sm">
-                Cerrar sesión
-              </Button>
-            </div>
+            <span className="text-sm text-gray-700">
+              Bienvenido, <span className="font-semibold text-pan-blue">{usuario.nombre}</span>
+            </span>
+            <Button onClick={handleLogout} variant="outline" size="sm">
+              Cerrar sesión
+            </Button>
           </div>
         </div>
-      </header>
+      </div>
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -121,14 +120,14 @@ export default function DashboardPage() {
 
         {/* Info Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <Card className="bg-blue-50 border-blue-200">
+          <Card className="bg-blue-50 border-2 border-pan-blue">
             <CardHeader>
-              <CardTitle className="text-blue-900">
+              <CardTitle className="text-pan-blue">
                 ¿Qué es el Divorcio Voluntario?
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-blue-800">
+              <p className="text-sm text-gray-700">
                 El divorcio voluntario es un procedimiento administrativo sin controversia
                 donde ambos cónyuges están de acuerdo en disolver el matrimonio. Este
                 portal te ayuda a generar el expediente completo de forma digital.
@@ -136,14 +135,14 @@ export default function DashboardPage() {
             </CardContent>
           </Card>
 
-          <Card className="bg-green-50 border-green-200">
+          <Card className="bg-blue-50 border-2 border-pan-blue">
             <CardHeader>
-              <CardTitle className="text-green-900">
+              <CardTitle className="text-pan-blue">
                 Documentos Necesarios
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <ul className="text-sm text-green-800 list-disc list-inside space-y-1">
+              <ul className="text-sm text-gray-700 list-disc list-inside space-y-1">
                 <li>INE de ambos cónyuges</li>
                 <li>Acta de matrimonio original</li>
                 <li>Convenio de divorcio firmado</li>

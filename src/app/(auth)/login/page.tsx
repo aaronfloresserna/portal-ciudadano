@@ -46,8 +46,19 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <Card className="w-full max-w-md">
+    <div className="min-h-screen flex items-center justify-center bg-white py-12 px-4 sm:px-6 lg:px-8">
+      {/* Logo y título */}
+      <div className="absolute top-8 left-1/2 transform -translate-x-1/2 flex flex-col items-center">
+        <img
+          src="https://chihuahua.gob.mx/sites/all/themes/Gobierno/images/logo.png"
+          alt="Escudo del Estado de Chihuahua"
+          className="h-20 w-auto mb-4"
+        />
+        <h1 className="text-2xl font-bold text-pan-blue">Portal Ciudadano</h1>
+        <p className="text-sm text-gray-600">Trámites Administrativos sin Litis</p>
+      </div>
+
+      <Card className="w-full max-w-md mt-32">
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl text-center">Iniciar sesión</CardTitle>
           <CardDescription className="text-center">
