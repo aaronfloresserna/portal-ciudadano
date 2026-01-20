@@ -5,12 +5,13 @@ import SignatureCanvas from 'react-signature-canvas'
 import { Button } from '@/components/ui/button'
 import { StepComponentProps } from '../OneQuestionWizard'
 
-export function SignatureQuestion({ value, onChange }: StepComponentProps) {
+export function SignatureQuestion({ value, onChange, onNext }: StepComponentProps) {
   const sigCanvas = useRef<SignatureCanvas>(null)
   const videoRef = useRef<HTMLVideoElement>(null)
   const [cameraActive, setCameraActive] = useState(false)
   const [stream, setStream] = useState<MediaStream | null>(null)
   const [error, setError] = useState<string>()
+  const streamRef = useRef<MediaStream | null>(null)
 
   useEffect(() => {
     // Activar cámara al montar el componente
@@ -36,6 +37,7 @@ export function SignatureQuestion({ value, onChange }: StepComponentProps) {
       if (videoRef.current) {
         videoRef.current.srcObject = mediaStream
         setStream(mediaStream)
+        streamRef.current = mediaStream
         setCameraActive(true)
       }
     } catch (err: any) {
@@ -45,9 +47,17 @@ export function SignatureQuestion({ value, onChange }: StepComponentProps) {
   }
 
   const stopCamera = () => {
-    if (stream) {
-      stream.getTracks().forEach((track) => track.stop())
+    const currentStream = streamRef.current || stream
+    if (currentStream) {
+      currentStream.getTracks().forEach((track) => {
+        track.stop()
+        console.log('Cámara apagada')
+      })
+      if (videoRef.current) {
+        videoRef.current.srcObject = null
+      }
       setStream(null)
+      streamRef.current = null
       setCameraActive(false)
     }
   }

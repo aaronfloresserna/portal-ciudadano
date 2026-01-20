@@ -261,12 +261,23 @@ export default function DivorcioTramitePage() {
       ),
     },
 
-    // FIRMAS (Pasos 18-19)
+    // FIRMAS (Pasos 18-20)
     {
       id: 'firma_conyuge1',
       title: `Firma del primer cónyuge`,
       description: 'Se grabará tu imagen mientras firmas como evidencia legal',
       component: SignatureQuestion,
+    },
+    {
+      id: 'aviso_firma_conyuge2',
+      title: 'Turno del segundo cónyuge',
+      description: 'Por favor, pasa el dispositivo al segundo cónyuge para que pueda firmar.',
+      component: (props: any) => (
+        <WelcomeStep
+          {...props}
+          customMessage="Ahora es momento de que el segundo cónyuge firme el convenio. Por favor entrega el dispositivo para continuar."
+        />
+      ),
     },
     {
       id: 'firma_conyuge2',
