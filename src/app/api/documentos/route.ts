@@ -1,7 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { writeFile, mkdir } from 'fs/promises'
-import { existsSync } from 'fs'
-import path from 'path'
 import { prisma } from '@/lib/db'
 import { getUserIdFromRequest } from '@/lib/auth'
 import crypto from 'crypto'
@@ -70,29 +67,21 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Crear directorio si no existe
-    const uploadDir = path.join(process.cwd(), 'public', 'uploads', tramiteId)
-    if (!existsSync(uploadDir)) {
-      await mkdir(uploadDir, { recursive: true })
-    }
-
-    // Generar nombre único para el archivo
-    const fileExtension = path.extname(file.name)
-    const fileName = `${tipo}_${Date.now()}_${crypto.randomBytes(8).toString('hex')}${fileExtension}`
-    const filePath = path.join(uploadDir, fileName)
-
-    // Guardar archivo
+    // Convertir archivo a base64 (para Vercel serverless)
     const bytes = await file.arrayBuffer()
     const buffer = Buffer.from(bytes)
-    await writeFile(filePath, buffer)
+    const base64 = buffer.toString('base64')
 
-    // Guardar referencia en la base de datos
+    // Generar un ID único para el archivo
+    const fileId = `${tipo}_${Date.now()}_${crypto.randomBytes(8).toString('hex')}`
+
+    // Guardar en la base de datos con el contenido en base64
     const documento = await prisma.documento.create({
       data: {
         tramiteId,
         tipo,
         nombreArchivo: file.name,
-        path: `/uploads/${tramiteId}/${fileName}`,
+        path: `data:${file.type};base64,${base64}`, // Data URI para acceso directo
         mimeType: file.type,
         size: file.size,
       },
