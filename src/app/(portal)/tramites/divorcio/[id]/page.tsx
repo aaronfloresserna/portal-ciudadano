@@ -10,6 +10,7 @@ import { FileUploadQuestion } from '@/components/forms/questions/FileUploadQuest
 import { YesNoQuestion } from '@/components/forms/questions/YesNoQuestion'
 import { NumberQuestion } from '@/components/forms/questions/NumberQuestion'
 import { WelcomeStep } from '@/components/forms/questions/WelcomeStep'
+import { SignatureQuestion } from '@/components/forms/questions/SignatureQuestion'
 
 export default function DivorcioTramitePage() {
   const router = useRouter()
@@ -258,6 +259,20 @@ export default function DivorcioTramitePage() {
           acceptedTypes="image/*,.pdf"
         />
       ),
+    },
+
+    // FIRMAS (Pasos 18-19)
+    {
+      id: 'firma_conyuge1',
+      title: `Firma del primer cónyuge`,
+      description: 'Se grabará tu imagen mientras firmas como evidencia legal',
+      component: SignatureQuestion,
+    },
+    {
+      id: 'firma_conyuge2',
+      title: `Firma del segundo cónyuge`,
+      description: 'Se grabará tu imagen mientras firmas como evidencia legal',
+      component: SignatureQuestion,
     },
   ]
 

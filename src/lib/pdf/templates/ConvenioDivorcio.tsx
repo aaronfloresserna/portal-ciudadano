@@ -1,4 +1,4 @@
-import { Document, Page, Text, View, StyleSheet, Font } from '@react-pdf/renderer'
+import { Document, Page, Text, View, StyleSheet, Image } from '@react-pdf/renderer'
 
 // Estilos para el documento
 const styles = StyleSheet.create({
@@ -37,6 +37,14 @@ const styles = StyleSheet.create({
   signatureLine: {
     width: '40%',
     textAlign: 'center',
+  },
+  signatureImage: {
+    width: 150,
+    height: 60,
+    marginBottom: 5,
+    alignSelf: 'center',
+  },
+  signatureText: {
     borderTopWidth: 1,
     borderTopColor: '#000',
     paddingTop: 5,
@@ -58,18 +66,22 @@ interface ConvenioDivorcioProps {
     conyuge1_apellidos: string
     conyuge2_nombre: string
     conyuge2_apellidos: string
-    
+
     // Matrimonio
     matrimonio_fecha: string
     matrimonio_lugar: string
     matrimonio_tieneHijos: boolean
     matrimonio_numeroHijos?: number
-    
+
     // Domicilio
     domicilio_calle?: string
     domicilio_numero?: string
     domicilio_colonia?: string
-    
+
+    // Firmas
+    firma_conyuge1?: string
+    firma_conyuge2?: string
+
     // Fechas
     fecha_presentacion?: string
   }
@@ -222,10 +234,16 @@ export function ConvenioDivorcio({ datos }: ConvenioDivorcioProps) {
         {/* Firmas */}
         <View style={styles.signatureSection}>
           <View style={styles.signatureLine}>
-            <Text style={styles.bold}>{conyuge1}</Text>
+            {datos.firma_conyuge1 && (
+              <Image src={datos.firma_conyuge1} style={styles.signatureImage} />
+            )}
+            <Text style={[styles.bold, styles.signatureText]}>{conyuge1}</Text>
           </View>
           <View style={styles.signatureLine}>
-            <Text style={styles.bold}>{conyuge2}</Text>
+            {datos.firma_conyuge2 && (
+              <Image src={datos.firma_conyuge2} style={styles.signatureImage} />
+            )}
+            <Text style={[styles.bold, styles.signatureText]}>{conyuge2}</Text>
           </View>
         </View>
 
