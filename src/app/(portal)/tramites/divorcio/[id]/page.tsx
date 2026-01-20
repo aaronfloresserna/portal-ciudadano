@@ -218,6 +218,7 @@ export default function DivorcioTramitePage() {
       component: (props: any) => (
         <NumberQuestion {...props} min={1} max={20} placeholder="Número de hijos" />
       ),
+      shouldShow: (data) => data.matrimonio_tieneHijos === true,
     },
 
     // DOMICILIO (Para el convenio)

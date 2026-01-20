@@ -17,7 +17,7 @@ export function FileUploadQuestion({
   tramiteId,
   tipoDocumento,
   acceptedTypes = 'image/*,.pdf',
-  maxSizeMB = 10,
+  maxSizeMB = 2,
 }: FileUploadQuestionProps) {
   const [isUploading, setIsUploading] = useState(false)
   const [preview, setPreview] = useState<string | null>(value?.path || null)

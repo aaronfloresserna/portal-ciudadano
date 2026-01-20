@@ -9,6 +9,7 @@ interface Step {
   title: string
   description?: string
   component: React.ComponentType<StepComponentProps>
+  shouldShow?: (data: any) => boolean
 }
 
 export interface StepComponentProps {
@@ -48,6 +49,24 @@ export function OneQuestionWizard({
     setError(undefined)
   }
 
+  const findNextVisibleStep = (fromStep: number): number => {
+    for (let i = fromStep + 1; i < steps.length; i++) {
+      if (!steps[i].shouldShow || steps[i].shouldShow!(data)) {
+        return i
+      }
+    }
+    return steps.length // No more steps
+  }
+
+  const findPreviousVisibleStep = (fromStep: number): number => {
+    for (let i = fromStep - 1; i >= 0; i--) {
+      if (!steps[i].shouldShow || steps[i].shouldShow!(data)) {
+        return i
+      }
+    }
+    return 0
+  }
+
   const handleNext = async () => {
     setError(undefined)
     setIsSaving(true)
@@ -62,8 +81,13 @@ export function OneQuestionWizard({
       if (currentStep === steps.length - 1) {
         onComplete(data)
       } else {
-        setCurrentStep(currentStep + 1)
-        window.scrollTo(0, 0)
+        const nextStep = findNextVisibleStep(currentStep)
+        if (nextStep >= steps.length) {
+          onComplete(data)
+        } else {
+          setCurrentStep(nextStep)
+          window.scrollTo(0, 0)
+        }
       }
     } catch (err: any) {
       setError(err.message || 'Error al guardar')
@@ -74,7 +98,8 @@ export function OneQuestionWizard({
 
   const handleBack = () => {
     if (currentStep > 0) {
-      setCurrentStep(currentStep - 1)
+      const prevStep = findPreviousVisibleStep(currentStep)
+      setCurrentStep(prevStep)
       window.scrollTo(0, 0)
     }
   }
