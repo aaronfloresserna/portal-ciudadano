@@ -14,6 +14,40 @@ export default function ConfirmacionPage() {
   const token = useAuthStore((state) => state.token)
   const [tramite, setTramite] = useState<any>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [isGenerating, setIsGenerating] = useState(false)
+
+  const handleDescargarConvenio = async () => {
+    try {
+      setIsGenerating(true)
+
+      const response = await fetch(`/api/tramites/${tramiteId}/generar-convenio`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+
+      if (!response.ok) {
+        throw new Error('Error al generar convenio')
+      }
+
+      // Descargar el PDF
+      const blob = await response.blob()
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `convenio-divorcio-${tramiteId}.pdf`
+      document.body.appendChild(a)
+      a.click()
+      window.URL.revokeObjectURL(url)
+      document.body.removeChild(a)
+    } catch (error) {
+      console.error('Error:', error)
+      alert('Error al generar el convenio. Por favor intenta de nuevo.')
+    } finally {
+      setIsGenerating(false)
+    }
+  }
 
   useEffect(() => {
     if (!token) {
@@ -196,8 +230,13 @@ export default function ConfirmacionPage() {
 
         {/* Acciones */}
         <div className="flex flex-col sm:flex-row gap-4">
-          <Button variant="outline" className="flex-1" disabled>
-            Descargar Expediente (PDF)
+          <Button
+            onClick={handleDescargarConvenio}
+            variant="outline"
+            className="flex-1"
+            disabled={isGenerating}
+          >
+            {isGenerating ? 'Generando PDF...' : 'Descargar Convenio (PDF)'}
           </Button>
           <Link href="/dashboard" className="flex-1">
             <Button className="w-full">Volver al Dashboard</Button>

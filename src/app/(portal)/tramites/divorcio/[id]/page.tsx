@@ -220,6 +220,30 @@ export default function DivorcioTramitePage() {
       ),
     },
 
+    // DOMICILIO (Para el convenio)
+    {
+      id: 'domicilio_calle',
+      title: 'Calle del domicilio para notificaciones',
+      description: 'Domicilio donde recibirán notificaciones del trámite',
+      component: (props: any) => (
+        <TextQuestion {...props} placeholder="Ej: Jacinto Roque Morón" maxLength={200} />
+      ),
+    },
+    {
+      id: 'domicilio_numero',
+      title: 'Número del domicilio',
+      component: (props: any) => (
+        <TextQuestion {...props} placeholder="Ej: 3803" maxLength={20} />
+      ),
+    },
+    {
+      id: 'domicilio_colonia',
+      title: 'Colonia',
+      component: (props: any) => (
+        <TextQuestion {...props} placeholder="Ej: Santa Rita" maxLength={100} />
+      ),
+    },
+
     // DOCUMENTOS (Pasos 15-17)
     {
       id: 'doc_actaMatrimonio',
@@ -231,19 +255,6 @@ export default function DivorcioTramitePage() {
           tramiteId={tramiteId}
           tipoDocumento="ACTA_MATRIMONIO"
           acceptedTypes="image/*,.pdf"
-        />
-      ),
-    },
-    {
-      id: 'doc_convenio',
-      title: 'Sube el convenio de divorcio',
-      description: 'Convenio firmado por ambos cónyuges (PDF)',
-      component: (props: any) => (
-        <FileUploadQuestion
-          {...props}
-          tramiteId={tramiteId}
-          tipoDocumento="CONVENIO"
-          acceptedTypes=".pdf"
         />
       ),
     },
