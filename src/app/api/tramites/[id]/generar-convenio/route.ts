@@ -1,9 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 import { getUserIdFromRequest } from '@/lib/auth'
-import { renderToBuffer } from '@react-pdf/renderer'
+import ReactPDF from '@react-pdf/renderer'
 import { ConvenioDivorcio } from '@/lib/pdf/templates/ConvenioDivorcio'
 import React from 'react'
+
+const { renderToBuffer } = ReactPDF
 
 export async function POST(
   request: NextRequest,
@@ -35,12 +37,11 @@ export async function POST(
       )
     }
 
-    // Generar el PDF usando React.createElement
+    // Generar el PDF - ConvenioDivorcio retorna un Document
     const documento = React.createElement(ConvenioDivorcio, {
       datos: tramite.datos as any
-    })
+    }) as any
 
-    // Renderizar a Buffer
     const buffer = await renderToBuffer(documento)
 
     // Retornar el PDF
