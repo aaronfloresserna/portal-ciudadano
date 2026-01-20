@@ -1,11 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 import { getUserIdFromRequest } from '@/lib/auth'
-import ReactPDF from '@react-pdf/renderer'
+import { renderToBuffer } from '@react-pdf/renderer'
 import { ConvenioDivorcio } from '@/lib/pdf/templates/ConvenioDivorcio'
 import React from 'react'
-
-const { renderToBuffer } = ReactPDF
 
 export async function POST(
   request: NextRequest,
