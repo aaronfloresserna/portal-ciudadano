@@ -76,18 +76,26 @@ interface ConvenioDivorcioProps {
 }
 
 export function ConvenioDivorcio({ datos }: ConvenioDivorcioProps) {
-  const conyuge1 = `${datos.conyuge1_nombre} ${datos.conyuge1_apellidos}`.toUpperCase()
-  const conyuge2 = `${datos.conyuge2_nombre} ${datos.conyuge2_apellidos}`.toUpperCase()
-  
-  const domicilio = datos.domicilio_calle 
-    ? `${datos.domicilio_calle} número ${datos.domicilio_numero} de la colonia ${datos.domicilio_colonia}` 
+  const conyuge1 = `${datos.conyuge1_nombre || ''} ${datos.conyuge1_apellidos || ''}`.trim().toUpperCase() || 'CÓNYUGE 1'
+  const conyuge2 = `${datos.conyuge2_nombre || ''} ${datos.conyuge2_apellidos || ''}`.trim().toUpperCase() || 'CÓNYUGE 2'
+
+  const domicilio = datos.domicilio_calle
+    ? `${datos.domicilio_calle} número ${datos.domicilio_numero || 'S/N'} de la colonia ${datos.domicilio_colonia || ''}`.trim()
     : 'el que consta en autos'
-  
+
   const fechaPresentacion = datos.fecha_presentacion || new Date().toLocaleDateString('es-MX', {
     day: 'numeric',
     month: 'long',
     year: 'numeric'
   })
+
+  const fechaMatrimonio = datos.matrimonio_fecha
+    ? new Date(datos.matrimonio_fecha).toLocaleDateString('es-MX', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric'
+      })
+    : '[FECHA MATRIMONIO]'
 
   return (
     <Document>
@@ -131,13 +139,9 @@ export function ConvenioDivorcio({ datos }: ConvenioDivorcioProps) {
         {/* Hecho I - Matrimonio */}
         <View style={styles.section}>
           <Text style={styles.indent}>
-            <Text style={styles.bold}>I.-</Text> Como lo acreditamos con la documental que agregamos 
-            al presente escrito, con fecha {new Date(datos.matrimonio_fecha).toLocaleDateString('es-MX', {
-              day: 'numeric',
-              month: 'long',
-              year: 'numeric'
-            })}, los suscritos contrajimos matrimonio en {datos.matrimonio_lugar}, bajo el régimen 
-            de Separación de Bienes.
+            <Text style={styles.bold}>I.-</Text> Como lo acreditamos con la documental que agregamos
+            al presente escrito, con fecha {fechaMatrimonio}, los suscritos contrajimos matrimonio en{' '}
+            {datos.matrimonio_lugar || '[LUGAR MATRIMONIO]'}, bajo el régimen de Separación de Bienes.
           </Text>
         </View>
 

@@ -37,6 +37,17 @@ export async function POST(
       )
     }
 
+    // Verificar que tengamos los datos mínimos
+    if (!tramite.datos || typeof tramite.datos !== 'object') {
+      console.error('Datos del trámite inválidos:', tramite.datos)
+      return NextResponse.json(
+        { error: 'Datos del trámite incompletos' },
+        { status: 400 }
+      )
+    }
+
+    console.log('Generando PDF con datos:', JSON.stringify(tramite.datos, null, 2))
+
     // Generar el PDF - ConvenioDivorcio retorna un Document
     const documento = React.createElement(ConvenioDivorcio, {
       datos: tramite.datos as any
