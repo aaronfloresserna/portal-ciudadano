@@ -44,8 +44,8 @@ export async function POST(
 
     const buffer = await renderToBuffer(documento)
 
-    // Retornar el PDF
-    return new NextResponse(buffer, {
+    // Retornar el PDF - convertir Buffer a Uint8Array
+    return new NextResponse(new Uint8Array(buffer), {
       headers: {
         'Content-Type': 'application/pdf',
         'Content-Disposition': `attachment; filename="convenio-divorcio-${params.id}.pdf"`,
