@@ -9,20 +9,25 @@ interface Hijo {
   nombre: string
   fechaNacimiento: string
   edad: number
+  actaNacimiento?: any
 }
 
 interface HijosFormQuestionProps extends StepComponentProps {
   numeroHijos: number
+  tramiteId: string
 }
 
-export function HijosFormQuestion({ value, onChange, numeroHijos }: HijosFormQuestionProps) {
+export function HijosFormQuestion({ value, onChange, numeroHijos, tramiteId }: HijosFormQuestionProps) {
   const [hijos, setHijos] = useState<Hijo[]>(
     value || Array.from({ length: numeroHijos }, () => ({
       nombre: '',
       fechaNacimiento: '',
       edad: 0,
+      actaNacimiento: null,
     }))
   )
+  const [isUploading, setIsUploading] = useState<{ [key: number]: boolean }>({})
+  const [uploadError, setUploadError] = useState<{ [key: number]: string }>({})
 
   const calcularEdad = (fechaNacimiento: string): number => {
     if (!fechaNacimiento) return 0
@@ -56,7 +61,49 @@ export function HijosFormQuestion({ value, onChange, numeroHijos }: HijosFormQue
     onChange(nuevosHijos)
   }
 
-  const todosCompletos = hijos.every((hijo) => hijo.nombre && hijo.fechaNacimiento)
+  const handleFileUpload = async (index: number, file: File) => {
+    setIsUploading({ ...isUploading, [index]: true })
+    setUploadError({ ...uploadError, [index]: '' })
+
+    try {
+      const formData = new FormData()
+      formData.append('file', file)
+      formData.append('tramiteId', tramiteId)
+      formData.append('tipo', `ACTA_NACIMIENTO_HIJO_${index + 1}`)
+
+      const token = localStorage.getItem('auth-storage')
+        ? JSON.parse(localStorage.getItem('auth-storage')!).state.token
+        : null
+
+      const response = await fetch('/api/documentos', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: formData,
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Error al subir archivo')
+      }
+
+      const nuevosHijos = [...hijos]
+      nuevosHijos[index] = {
+        ...nuevosHijos[index],
+        actaNacimiento: data.documento,
+      }
+      setHijos(nuevosHijos)
+      onChange(nuevosHijos)
+    } catch (err: any) {
+      setUploadError({ ...uploadError, [index]: err.message })
+    } finally {
+      setIsUploading({ ...isUploading, [index]: false })
+    }
+  }
+
+  const todosCompletos = hijos.every((hijo) => hijo.nombre && hijo.fechaNacimiento && hijo.actaNacimiento)
 
   return (
     <div className="space-y-6">
@@ -97,6 +144,31 @@ export function HijosFormQuestion({ value, onChange, numeroHijos }: HijosFormQue
                 </p>
               )}
             </div>
+
+            <div>
+              <label className="block text-sm font-medium text-black mb-2">
+                Acta de nacimiento
+              </label>
+              <Input
+                type="file"
+                accept="image/*,.pdf"
+                onChange={(e) => {
+                  const file = e.target.files?.[0]
+                  if (file) handleFileUpload(index, file)
+                }}
+                className="text-lg py-6"
+                disabled={isUploading[index]}
+              />
+              {isUploading[index] && (
+                <p className="text-sm text-blue-600 mt-2">Subiendo archivo...</p>
+              )}
+              {uploadError[index] && (
+                <p className="text-sm text-red-600 mt-2">{uploadError[index]}</p>
+              )}
+              {hijo.actaNacimiento && !isUploading[index] && (
+                <p className="text-sm text-green-600 mt-2">✓ Acta subida correctamente</p>
+              )}
+            </div>
           </div>
         </div>
       ))}
@@ -104,7 +176,7 @@ export function HijosFormQuestion({ value, onChange, numeroHijos }: HijosFormQue
       {!todosCompletos && (
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
           <p className="text-sm text-black">
-            Por favor completa la información de todos los hijos para continuar
+            Por favor completa la información de todos los hijos (nombre, fecha de nacimiento y acta de nacimiento) para continuar
           </p>
         </div>
       )}

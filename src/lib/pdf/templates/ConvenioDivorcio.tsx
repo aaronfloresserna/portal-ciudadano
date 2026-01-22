@@ -81,7 +81,12 @@ interface ConvenioDivorcioProps {
     }>
 
     // Convivencia y pensión (solo si tienen hijos)
-    convivencia_tipo?: string
+    guardia_custodia?: string
+    convivencia_dias?: string
+    convivencia_horarios?: string
+    convivencia_vacaciones?: string
+    gastos_medicos?: string
+    gastos_escolares?: string
     pension_monto?: number
     pension_responsable?: string
 
@@ -190,8 +195,20 @@ export function ConvenioDivorcio({ datos }: ConvenioDivorcioProps) {
             <Text style={styles.indent}>
               <Text style={styles.bold}>III.-</Text> Respecto de los menores de edad procreados,
               hemos convenido lo siguiente:{'\n\n'}
-              <Text style={styles.bold}>a) CONVIVENCIA:</Text> {datos.convivencia_tipo || 'Se establecerá conforme a lo que determine la autoridad competente.'}{'\n\n'}
-              <Text style={styles.bold}>b) PENSIÓN ALIMENTICIA:</Text> La parte responsable{' '}
+
+              <Text style={styles.bold}>a) GUARDIA Y CUSTODIA:</Text> La guardia y custodia de los menores será{' '}
+              {datos.guardia_custodia || 'determinada conforme a la autoridad competente'}.{'\n\n'}
+
+              <Text style={styles.bold}>b) RÉGIMEN DE CONVIVENCIA:{'\n'}</Text>
+              <Text>• Días de convivencia: {datos.convivencia_dias || 'A determinar'}{'\n'}</Text>
+              <Text>• Horarios de entrega y recogida: {datos.convivencia_horarios || 'A determinar'}{'\n'}</Text>
+              <Text>• Vacaciones y días festivos: {datos.convivencia_vacaciones || 'A determinar'}{'\n\n'}</Text>
+
+              <Text style={styles.bold}>c) GASTOS MÉDICOS:</Text> {datos.gastos_medicos || 'Se dividirán conforme a lo acordado por las partes.'}{'\n\n'}
+
+              <Text style={styles.bold}>d) GASTOS ESCOLARES:</Text> {datos.gastos_escolares || 'Se dividirán conforme a lo acordado por las partes.'}{'\n\n'}
+
+              <Text style={styles.bold}>e) PENSIÓN ALIMENTICIA:</Text> La parte responsable{' '}
               {datos.pension_responsable ? `(${datos.pension_responsable})` : ''} se obliga a proporcionar
               una pensión alimenticia mensual por la cantidad de ${datos.pension_monto ? datos.pension_monto.toLocaleString('es-MX') : '_______'} MXN
               ({datos.pension_monto ? 'pesos mexicanos' : 'a determinar'}), que será depositada
@@ -234,22 +251,20 @@ export function ConvenioDivorcio({ datos }: ConvenioDivorcioProps) {
           </Text>
         </View>
 
-        {/* Jurisprudencia (solo cuando NO tienen hijos) */}
-        {!datos.matrimonio_tieneHijos && (
-          <View style={styles.section}>
-            <Text style={styles.indent}>
-              <Text style={styles.bold}>JURISPRUDENCIA APLICABLE:{'\n\n'}</Text>
-              Es aplicable la tesis aislada de la Primera Sala de la Suprema Corte de Justicia
-              de la Nación, publicada en el Semanario Judicial de la Federación, que establece:{'\n\n'}
-              <Text style={styles.bold}>"DIVORCIO SIN EXPRESIÓN DE CAUSA. EL ARTÍCULO 266 DEL CÓDIGO CIVIL
-              PARA EL ESTADO DE CHIHUAHUA, QUE LO ESTABLECE, NO VIOLA EL DERECHO HUMANO AL LIBRE DESARROLLO
-              DE LA PERSONALIDAD."</Text>{'\n\n'}
-              Lo anterior en virtud de que el divorcio sin expresión de causa es una institución que
-              protege el derecho humano al libre desarrollo de la personalidad, permitiendo a las personas
-              disolver el vínculo matrimonial sin necesidad de acreditar causal alguna.
-            </Text>
-          </View>
-        )}
+        {/* Jurisprudencia (siempre) */}
+        <View style={styles.section}>
+          <Text style={styles.indent}>
+            <Text style={styles.bold}>JURISPRUDENCIA APLICABLE:{'\n\n'}</Text>
+            Es aplicable la tesis aislada de la Primera Sala de la Suprema Corte de Justicia
+            de la Nación, publicada en el Semanario Judicial de la Federación, que establece:{'\n\n'}
+            <Text style={styles.bold}>"DIVORCIO SIN EXPRESIÓN DE CAUSA. EL ARTÍCULO 266 DEL CÓDIGO CIVIL
+            PARA EL ESTADO DE CHIHUAHUA, QUE LO ESTABLECE, NO VIOLA EL DERECHO HUMANO AL LIBRE DESARROLLO
+            DE LA PERSONALIDAD."</Text>{'\n\n'}
+            Lo anterior en virtud de que el divorcio sin expresión de causa es una institución que
+            protege el derecho humano al libre desarrollo de la personalidad, permitiendo a las personas
+            disolver el vínculo matrimonial sin necesidad de acreditar causal alguna.
+          </Text>
+        </View>
 
         {/* Petitorio */}
         <View style={styles.section}>

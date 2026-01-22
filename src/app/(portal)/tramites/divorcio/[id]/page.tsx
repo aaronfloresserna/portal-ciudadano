@@ -229,23 +229,82 @@ export default function DivorcioTramitePage() {
       title: 'Información de los hijos',
       description: 'Por favor proporciona los datos de cada hijo',
       component: (props: any) => (
-        <HijosFormQuestion {...props} numeroHijos={tramite?.datos?.matrimonio_numeroHijos || 1} />
+        <HijosFormQuestion
+          {...props}
+          numeroHijos={tramite?.datos?.matrimonio_numeroHijos || 1}
+          tramiteId={tramiteId}
+        />
       ),
       shouldShow: (data: any) => data.matrimonio_tieneHijos === true && data.matrimonio_numeroHijos > 0,
     },
 
-    // Convivencia (solo si tienen hijos)
+    // Guardia y custodia (solo si tienen hijos)
     {
-      id: 'convivencia_tipo',
-      title: '¿Cómo será el régimen de convivencia con los hijos?',
-      description: 'Describe cómo se organizará la convivencia con los menores',
+      id: 'guardia_custodia',
+      title: '¿Cómo será la guardia y custodia de los hijos?',
+      description: 'Por ejemplo: Compartida, Con el padre, Con la madre',
+      component: (props: any) => (
+        <TextQuestion {...props} maxLength={200} />
+      ),
+      shouldShow: (data: any) => data.matrimonio_tieneHijos === true,
+    },
+
+    // Convivencia - Días específicos
+    {
+      id: 'convivencia_dias',
+      title: '¿Qué días convivirá el menor con cada padre?',
+      description: 'Especifica días de la semana, fines de semana, etc.',
       component: (props: any) => (
         <TextQuestion {...props} maxLength={500} />
       ),
       shouldShow: (data: any) => data.matrimonio_tieneHijos === true,
     },
 
-    // Pensión alimenticia (solo si tienen hijos)
+    // Convivencia - Horarios
+    {
+      id: 'convivencia_horarios',
+      title: '¿Cuáles serán los horarios de entrega y recogida del menor?',
+      description: 'Horarios específicos para la entrega y recogida',
+      component: (props: any) => (
+        <TextQuestion {...props} maxLength={300} />
+      ),
+      shouldShow: (data: any) => data.matrimonio_tieneHijos === true,
+    },
+
+    // Convivencia - Vacaciones
+    {
+      id: 'convivencia_vacaciones',
+      title: '¿Cómo será la convivencia en vacaciones y días festivos?',
+      description: 'Vacaciones escolares, navidad, semana santa, etc.',
+      component: (props: any) => (
+        <TextQuestion {...props} maxLength={500} />
+      ),
+      shouldShow: (data: any) => data.matrimonio_tieneHijos === true,
+    },
+
+    // Gastos médicos
+    {
+      id: 'gastos_medicos',
+      title: '¿Quién será responsable de los gastos médicos?',
+      description: 'Especifica cómo se dividirán los gastos médicos',
+      component: (props: any) => (
+        <TextQuestion {...props} maxLength={300} />
+      ),
+      shouldShow: (data: any) => data.matrimonio_tieneHijos === true,
+    },
+
+    // Gastos escolares
+    {
+      id: 'gastos_escolares',
+      title: '¿Quién será responsable de los gastos escolares?',
+      description: 'Especifica cómo se dividirán los gastos escolares',
+      component: (props: any) => (
+        <TextQuestion {...props} maxLength={300} />
+      ),
+      shouldShow: (data: any) => data.matrimonio_tieneHijos === true,
+    },
+
+    // Pensión alimenticia - Monto
     {
       id: 'pension_monto',
       title: '¿Cuál será el monto de la pensión alimenticia mensual?',
@@ -255,6 +314,8 @@ export default function DivorcioTramitePage() {
       ),
       shouldShow: (data: any) => data.matrimonio_tieneHijos === true,
     },
+
+    // Pensión alimenticia - Responsable
     {
       id: 'pension_responsable',
       title: '¿Quién será responsable de pagar la pensión alimenticia?',
