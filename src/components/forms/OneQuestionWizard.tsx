@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useRef } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 
@@ -38,6 +38,7 @@ export function OneQuestionWizard({
   const [data, setData] = useState<any>(initialData)
   const [error, setError] = useState<string>()
   const [isSaving, setIsSaving] = useState(false)
+  const dataRef = useRef<any>(initialData)
 
   const step = steps[currentStep]
   const CurrentComponent = step.component
@@ -45,22 +46,24 @@ export function OneQuestionWizard({
   const progress = ((currentStep + 1) / steps.length) * 100
 
   const handleValueChange = (value: any) => {
-    setData({ ...data, [step.id]: value })
+    const newData = { ...dataRef.current, [step.id]: value }
+    dataRef.current = newData
+    setData(newData)
     setError(undefined)
   }
 
-  const findNextVisibleStep = (fromStep: number): number => {
+  const findNextVisibleStep = (fromStep: number, currentData: any): number => {
     for (let i = fromStep + 1; i < steps.length; i++) {
-      if (!steps[i].shouldShow || steps[i].shouldShow!(data)) {
+      if (!steps[i].shouldShow || steps[i].shouldShow!(currentData)) {
         return i
       }
     }
     return steps.length // No more steps
   }
 
-  const findPreviousVisibleStep = (fromStep: number): number => {
+  const findPreviousVisibleStep = (fromStep: number, currentData: any): number => {
     for (let i = fromStep - 1; i >= 0; i--) {
-      if (!steps[i].shouldShow || steps[i].shouldShow!(data)) {
+      if (!steps[i].shouldShow || steps[i].shouldShow!(currentData)) {
         return i
       }
     }
@@ -72,18 +75,20 @@ export function OneQuestionWizard({
     setIsSaving(true)
 
     try {
+      const currentData = dataRef.current
+
       // Guardar progreso
       if (onSave) {
-        await onSave(currentStep + 1, data)
+        await onSave(currentStep + 1, currentData)
       }
 
       // Si es el último paso, completar
       if (currentStep === steps.length - 1) {
-        onComplete(data)
+        onComplete(currentData)
       } else {
-        const nextStep = findNextVisibleStep(currentStep)
+        const nextStep = findNextVisibleStep(currentStep, currentData)
         if (nextStep >= steps.length) {
-          onComplete(data)
+          onComplete(currentData)
         } else {
           setCurrentStep(nextStep)
           window.scrollTo(0, 0)
@@ -98,7 +103,8 @@ export function OneQuestionWizard({
 
   const handleBack = () => {
     if (currentStep > 0) {
-      const prevStep = findPreviousVisibleStep(currentStep)
+      const currentData = dataRef.current
+      const prevStep = findPreviousVisibleStep(currentStep, currentData)
       setCurrentStep(prevStep)
       window.scrollTo(0, 0)
     }
