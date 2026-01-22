@@ -73,6 +73,13 @@ interface ConvenioDivorcioProps {
     matrimonio_tieneHijos: boolean
     matrimonio_numeroHijos?: number
 
+    // Datos de los hijos
+    hijos_datos?: Array<{
+      nombre: string
+      fechaNacimiento: string
+      edad: number
+    }>
+
     // Convivencia y pensión (solo si tienen hijos)
     convivencia_tipo?: string
     pension_monto?: number
@@ -168,7 +175,12 @@ export function ConvenioDivorcio({ datos }: ConvenioDivorcioProps) {
             <Text style={styles.bold}>II.-</Text> Bajo protesta de decir verdad, manifestamos a
             su señoría que durante nuestro matrimonio los suscritos {datos.matrimonio_tieneHijos
               ? `procreamos ${datos.matrimonio_numeroHijos} hijo(s)`
-              : 'no procreamos hijos'}.
+              : 'no procreamos hijos'}{datos.matrimonio_tieneHijos && datos.hijos_datos && datos.hijos_datos.length > 0
+              ? ', cuyos nombres y edades son los siguientes:'
+              : '.'}{'\n'}
+            {datos.matrimonio_tieneHijos && datos.hijos_datos && datos.hijos_datos.map((hijo, index) => (
+              `${index + 1}. ${hijo.nombre}, de ${hijo.edad} años de edad.\n`
+            )).join('')}
           </Text>
         </View>
 
@@ -215,12 +227,29 @@ export function ConvenioDivorcio({ datos }: ConvenioDivorcioProps) {
 
         <View style={styles.section}>
           <Text style={styles.indent}>
-            Fundan nuestra demanda los artículos 254, 255, 266, 267 y demás relativos del Código 
-            Civil para nuestro Estado, así como los artículos 410, 411 y demás relativos del 
-            Código Procesal Civil, ambos del Estado de Chihuahua. Así como los artículos 569 a 
+            Fundan nuestra demanda los artículos 254, 255, 266, 267 y demás relativos del Código
+            Civil para nuestro Estado, así como los artículos 410, 411 y demás relativos del
+            Código Procesal Civil, ambos del Estado de Chihuahua. Así como los artículos 569 a
             576 del Código de Procedimientos Familiares para el Estado de Chihuahua.
           </Text>
         </View>
+
+        {/* Jurisprudencia (solo cuando NO tienen hijos) */}
+        {!datos.matrimonio_tieneHijos && (
+          <View style={styles.section}>
+            <Text style={styles.indent}>
+              <Text style={styles.bold}>JURISPRUDENCIA APLICABLE:{'\n\n'}</Text>
+              Es aplicable la tesis aislada de la Primera Sala de la Suprema Corte de Justicia
+              de la Nación, publicada en el Semanario Judicial de la Federación, que establece:{'\n\n'}
+              <Text style={styles.bold}>"DIVORCIO SIN EXPRESIÓN DE CAUSA. EL ARTÍCULO 266 DEL CÓDIGO CIVIL
+              PARA EL ESTADO DE CHIHUAHUA, QUE LO ESTABLECE, NO VIOLA EL DERECHO HUMANO AL LIBRE DESARROLLO
+              DE LA PERSONALIDAD."</Text>{'\n\n'}
+              Lo anterior en virtud de que el divorcio sin expresión de causa es una institución que
+              protege el derecho humano al libre desarrollo de la personalidad, permitiendo a las personas
+              disolver el vínculo matrimonial sin necesidad de acreditar causal alguna.
+            </Text>
+          </View>
+        )}
 
         {/* Petitorio */}
         <View style={styles.section}>

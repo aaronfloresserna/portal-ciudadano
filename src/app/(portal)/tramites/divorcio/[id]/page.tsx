@@ -11,6 +11,7 @@ import { YesNoQuestion } from '@/components/forms/questions/YesNoQuestion'
 import { NumberQuestion } from '@/components/forms/questions/NumberQuestion'
 import { WelcomeStep } from '@/components/forms/questions/WelcomeStep'
 import { SignatureQuestion } from '@/components/forms/questions/SignatureQuestion'
+import { HijosFormQuestion } from '@/components/forms/questions/HijosFormQuestion'
 
 export default function DivorcioTramitePage() {
   const router = useRouter()
@@ -220,6 +221,17 @@ export default function DivorcioTramitePage() {
         <NumberQuestion {...props} min={1} max={20} />
       ),
       shouldShow: (data: any) => data.matrimonio_tieneHijos === true,
+    },
+
+    // Formulario de datos de cada hijo
+    {
+      id: 'hijos_datos',
+      title: 'Información de los hijos',
+      description: 'Por favor proporciona los datos de cada hijo',
+      component: (props: any) => (
+        <HijosFormQuestion {...props} numeroHijos={tramite?.datos?.matrimonio_numeroHijos || 1} />
+      ),
+      shouldShow: (data: any) => data.matrimonio_tieneHijos === true && data.matrimonio_numeroHijos > 0,
     },
 
     // Convivencia (solo si tienen hijos)
