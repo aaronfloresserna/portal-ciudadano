@@ -6,7 +6,6 @@ import { StepComponentProps } from '../OneQuestionWizard'
 interface NumberQuestionProps extends StepComponentProps {
   min?: number
   max?: number
-  placeholder?: string
 }
 
 export function NumberQuestion({
@@ -15,7 +14,6 @@ export function NumberQuestion({
   onNext,
   min = 0,
   max,
-  placeholder,
 }: NumberQuestionProps) {
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && value !== undefined && value !== null) {
@@ -32,12 +30,11 @@ export function NumberQuestion({
         onKeyPress={handleKeyPress}
         min={min}
         max={max}
-        placeholder={placeholder}
         className="text-lg py-6"
         autoFocus
       />
       {min !== undefined && max !== undefined && (
-        <p className="text-sm text-gray-500">
+        <p className="text-sm text-black">
           Debe ser un número entre {min} y {max}
         </p>
       )}

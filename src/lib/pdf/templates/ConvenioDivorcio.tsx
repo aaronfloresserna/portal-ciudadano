@@ -73,6 +73,11 @@ interface ConvenioDivorcioProps {
     matrimonio_tieneHijos: boolean
     matrimonio_numeroHijos?: number
 
+    // Convivencia y pensión (solo si tienen hijos)
+    convivencia_tipo?: string
+    pension_monto?: number
+    pension_responsable?: string
+
     // Domicilio
     domicilio_calle?: string
     domicilio_numero?: string
@@ -160,29 +165,45 @@ export function ConvenioDivorcio({ datos }: ConvenioDivorcioProps) {
         {/* Hecho II - Hijos */}
         <View style={styles.section}>
           <Text style={styles.indent}>
-            <Text style={styles.bold}>II.-</Text> Bajo protesta de decir verdad, manifestamos a 
-            su señoría que durante nuestro matrimonio los suscritos {datos.matrimonio_tieneHijos 
-              ? `procreamos ${datos.matrimonio_numeroHijos} hijo(s)` 
+            <Text style={styles.bold}>II.-</Text> Bajo protesta de decir verdad, manifestamos a
+            su señoría que durante nuestro matrimonio los suscritos {datos.matrimonio_tieneHijos
+              ? `procreamos ${datos.matrimonio_numeroHijos} hijo(s)`
               : 'no procreamos hijos'}.
           </Text>
         </View>
 
-        {/* Hecho III - Voluntad de divorcio */}
+        {/* Hecho III - Convivencia y pensión (solo si tienen hijos) */}
+        {datos.matrimonio_tieneHijos && (
+          <View style={styles.section}>
+            <Text style={styles.indent}>
+              <Text style={styles.bold}>III.-</Text> Respecto de los menores de edad procreados,
+              hemos convenido lo siguiente:{'\n\n'}
+              <Text style={styles.bold}>a) CONVIVENCIA:</Text> {datos.convivencia_tipo || 'Se establecerá conforme a lo que determine la autoridad competente.'}{'\n\n'}
+              <Text style={styles.bold}>b) PENSIÓN ALIMENTICIA:</Text> La parte responsable{' '}
+              {datos.pension_responsable ? `(${datos.pension_responsable})` : ''} se obliga a proporcionar
+              una pensión alimenticia mensual por la cantidad de ${datos.pension_monto ? datos.pension_monto.toLocaleString('es-MX') : '_______'} MXN
+              ({datos.pension_monto ? 'pesos mexicanos' : 'a determinar'}), que será depositada
+              en la cuenta bancaria que se designe, durante los primeros cinco días de cada mes.
+            </Text>
+          </View>
+        )}
+
+        {/* Hecho III/IV - Voluntad de divorcio */}
         <View style={styles.section}>
           <Text style={styles.indent}>
-            <Text style={styles.bold}>III.-</Text> Es el caso que por así convenir a nuestros 
-            intereses, hemos decidido disolver nuestra unión matrimonial sin sujeción a causal 
-            alguna, toda vez que desde hace tiempo nos encontramos separados y no existe convivencia, 
+            <Text style={styles.bold}>{datos.matrimonio_tieneHijos ? 'IV' : 'III'}.-</Text> Es el caso que por así convenir a nuestros
+            intereses, hemos decidido disolver nuestra unión matrimonial sin sujeción a causal
+            alguna, toda vez que desde hace tiempo nos encontramos separados y no existe convivencia,
             ni relación matrimonial que justifique nuestro estado civil.
           </Text>
         </View>
 
-        {/* Hecho IV - Bienes */}
+        {/* Hecho IV/V - Bienes */}
         <View style={styles.section}>
           <Text style={styles.indent}>
-            <Text style={styles.bold}>IV.-</Text> Además que nos casamos bajo el régimen de 
+            <Text style={styles.bold}>{datos.matrimonio_tieneHijos ? 'V' : 'IV'}.-</Text> Además que nos casamos bajo el régimen de
             separación de bienes, los suscritos <Text style={styles.bold}>{conyuge1}</Text> y{' '}
-            <Text style={styles.bold}>{conyuge2}</Text>, no adquirimos bienes muebles ni inmuebles 
+            <Text style={styles.bold}>{conyuge2}</Text>, no adquirimos bienes muebles ni inmuebles
             en copropiedad.
           </Text>
         </View>

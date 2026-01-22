@@ -109,7 +109,7 @@ export default function DivorcioTramitePage() {
       title: '¿Cuál es el nombre del primer cónyuge?',
       description: 'Solo el nombre o nombres (sin apellidos)',
       component: (props: any) => (
-        <TextQuestion {...props} placeholder="Ej: Juan Carlos" maxLength={100} />
+        <TextQuestion {...props} maxLength={100} validateName />
       ),
     },
     {
@@ -117,7 +117,7 @@ export default function DivorcioTramitePage() {
       title: '¿Cuáles son los apellidos del primer cónyuge?',
       description: 'Apellido paterno y materno',
       component: (props: any) => (
-        <TextQuestion {...props} placeholder="Ej: García López" maxLength={100} />
+        <TextQuestion {...props} maxLength={100} validateName />
       ),
     },
     {
@@ -125,7 +125,7 @@ export default function DivorcioTramitePage() {
       title: 'CURP del primer cónyuge',
       description: '18 caracteres que aparecen en la identificación oficial',
       component: (props: any) => (
-        <TextQuestion {...props} placeholder="Ej: GACJ850615HDFRRN09" maxLength={18} />
+        <TextQuestion {...props} maxLength={18} minLength={18} validateCURP />
       ),
     },
     {
@@ -153,7 +153,7 @@ export default function DivorcioTramitePage() {
       title: '¿Cuál es el nombre del segundo cónyuge?',
       description: 'Solo el nombre o nombres (sin apellidos)',
       component: (props: any) => (
-        <TextQuestion {...props} placeholder="Ej: María Elena" maxLength={100} />
+        <TextQuestion {...props} maxLength={100} validateName />
       ),
     },
     {
@@ -161,7 +161,7 @@ export default function DivorcioTramitePage() {
       title: '¿Cuáles son los apellidos del segundo cónyuge?',
       description: 'Apellido paterno y materno',
       component: (props: any) => (
-        <TextQuestion {...props} placeholder="Ej: Rodríguez Martínez" maxLength={100} />
+        <TextQuestion {...props} maxLength={100} validateName />
       ),
     },
     {
@@ -169,7 +169,7 @@ export default function DivorcioTramitePage() {
       title: 'CURP del segundo cónyuge',
       description: '18 caracteres que aparecen en la identificación oficial',
       component: (props: any) => (
-        <TextQuestion {...props} placeholder="Ej: ROME900812MDFRRL07" maxLength={18} />
+        <TextQuestion {...props} maxLength={18} minLength={18} validateCURP />
       ),
     },
     {
@@ -203,7 +203,7 @@ export default function DivorcioTramitePage() {
       title: '¿Dónde se casaron?',
       description: 'Ciudad y Estado donde se celebró el matrimonio',
       component: (props: any) => (
-        <TextQuestion {...props} placeholder="Ej: Chihuahua, Chihuahua" maxLength={200} />
+        <TextQuestion {...props} maxLength={200} />
       ),
     },
     {
@@ -217,7 +217,37 @@ export default function DivorcioTramitePage() {
       id: 'matrimonio_numeroHijos',
       title: '¿Cuántos hijos tienen?',
       component: (props: any) => (
-        <NumberQuestion {...props} min={1} max={20} placeholder="Número de hijos" />
+        <NumberQuestion {...props} min={1} max={20} />
+      ),
+      shouldShow: (data: any) => data.matrimonio_tieneHijos === true,
+    },
+
+    // Convivencia (solo si tienen hijos)
+    {
+      id: 'convivencia_tipo',
+      title: '¿Cómo será el régimen de convivencia con los hijos?',
+      description: 'Describe cómo se organizará la convivencia con los menores',
+      component: (props: any) => (
+        <TextQuestion {...props} maxLength={500} />
+      ),
+      shouldShow: (data: any) => data.matrimonio_tieneHijos === true,
+    },
+
+    // Pensión alimenticia (solo si tienen hijos)
+    {
+      id: 'pension_monto',
+      title: '¿Cuál será el monto de la pensión alimenticia mensual?',
+      description: 'Monto en pesos mexicanos (MXN)',
+      component: (props: any) => (
+        <NumberQuestion {...props} min={0} max={1000000} />
+      ),
+      shouldShow: (data: any) => data.matrimonio_tieneHijos === true,
+    },
+    {
+      id: 'pension_responsable',
+      title: '¿Quién será responsable de pagar la pensión alimenticia?',
+      component: (props: any) => (
+        <TextQuestion {...props} maxLength={200} />
       ),
       shouldShow: (data: any) => data.matrimonio_tieneHijos === true,
     },
@@ -228,21 +258,21 @@ export default function DivorcioTramitePage() {
       title: 'Calle del domicilio para notificaciones',
       description: 'Domicilio donde recibirán notificaciones del trámite',
       component: (props: any) => (
-        <TextQuestion {...props} placeholder="Ej: Jacinto Roque Morón" maxLength={200} />
+        <TextQuestion {...props} maxLength={200} />
       ),
     },
     {
       id: 'domicilio_numero',
       title: 'Número del domicilio',
       component: (props: any) => (
-        <TextQuestion {...props} placeholder="Ej: 3803" maxLength={20} />
+        <TextQuestion {...props} maxLength={20} />
       ),
     },
     {
       id: 'domicilio_colonia',
       title: 'Colonia',
       component: (props: any) => (
-        <TextQuestion {...props} placeholder="Ej: Santa Rita" maxLength={100} />
+        <TextQuestion {...props} maxLength={100} />
       ),
     },
 

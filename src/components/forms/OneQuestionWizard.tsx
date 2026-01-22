@@ -110,10 +110,10 @@ export function OneQuestionWizard({
         {/* Progress Bar */}
         <div className="mb-8">
           <div className="flex justify-between items-center mb-2">
-            <span className="text-sm font-medium text-gray-700">
+            <span className="text-sm font-medium text-black">
               Paso {currentStep + 1} de {steps.length}
             </span>
-            <span className="text-sm text-gray-500">
+            <span className="text-sm text-black">
               {Math.round(progress)}% completado
             </span>
           </div>
@@ -176,7 +176,7 @@ export function OneQuestionWizard({
         </div>
 
         {/* Help text */}
-        <p className="text-center text-sm text-gray-500 mt-6">
+        <p className="text-center text-sm text-black mt-6">
           Tu progreso se guarda automáticamente. Puedes regresar en cualquier momento.
         </p>
       </div>
