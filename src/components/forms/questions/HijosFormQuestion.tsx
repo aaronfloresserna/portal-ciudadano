@@ -129,7 +129,7 @@ export function HijosFormQuestion({ value, onChange, numeroHijos, tramiteId }: H
       {hijos.map((hijo, index) => (
         <div key={index} className="border border-gray-300 rounded-lg p-4 bg-white">
           <h3 className="font-semibold text-black mb-4">
-            Hijo {index + 1} de {numeroHijos}
+            Hijo(a) {index + 1} de {numeroHijos}
           </h3>
 
           <div className="space-y-4">

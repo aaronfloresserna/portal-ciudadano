@@ -12,6 +12,11 @@ import { NumberQuestion } from '@/components/forms/questions/NumberQuestion'
 import { WelcomeStep } from '@/components/forms/questions/WelcomeStep'
 import { SignatureQuestion } from '@/components/forms/questions/SignatureQuestion'
 import { HijosFormQuestion } from '@/components/forms/questions/HijosFormQuestion'
+import { SelectQuestion } from '@/components/forms/questions/SelectQuestion'
+import { CheckboxGroupQuestion } from '@/components/forms/questions/CheckboxGroupQuestion'
+import { RadioQuestion } from '@/components/forms/questions/RadioQuestion'
+import { GastosQuestion } from '@/components/forms/questions/GastosQuestion'
+import { PensionQuestion } from '@/components/forms/questions/PensionQuestion'
 
 export default function DivorcioTramitePage() {
   const router = useRouter()
@@ -135,14 +140,27 @@ export default function DivorcioTramitePage() {
       component: DateQuestion,
     },
     {
-      id: 'conyuge1_ine',
-      title: 'Sube la INE del primer cónyuge',
-      description: 'Foto o escaneo de la identificación oficial (INE o IFE)',
+      id: 'conyuge1_ine_frontal',
+      title: 'Sube la parte frontal de la INE del primer cónyuge',
+      description: 'Foto o escaneo de la parte frontal de la identificación oficial (INE o IFE)',
       component: (props: any) => (
         <FileUploadQuestion
           {...props}
           tramiteId={tramiteId}
-          tipoDocumento="INE_CONYUGE_1"
+          tipoDocumento="INE_CONYUGE_1_FRONTAL"
+          acceptedTypes="image/*"
+        />
+      ),
+    },
+    {
+      id: 'conyuge1_ine_trasera',
+      title: 'Sube la parte trasera de la INE del primer cónyuge',
+      description: 'Foto o escaneo de la parte trasera de la identificación oficial (INE o IFE)',
+      component: (props: any) => (
+        <FileUploadQuestion
+          {...props}
+          tramiteId={tramiteId}
+          tipoDocumento="INE_CONYUGE_1_TRASERA"
           acceptedTypes="image/*"
         />
       ),
@@ -179,14 +197,27 @@ export default function DivorcioTramitePage() {
       component: DateQuestion,
     },
     {
-      id: 'conyuge2_ine',
-      title: 'Sube la INE del segundo cónyuge',
-      description: 'Foto o escaneo de la identificación oficial (INE o IFE)',
+      id: 'conyuge2_ine_frontal',
+      title: 'Sube la parte frontal de la INE del segundo cónyuge',
+      description: 'Foto o escaneo de la parte frontal de la identificación oficial (INE o IFE)',
       component: (props: any) => (
         <FileUploadQuestion
           {...props}
           tramiteId={tramiteId}
-          tipoDocumento="INE_CONYUGE_2"
+          tipoDocumento="INE_CONYUGE_2_FRONTAL"
+          acceptedTypes="image/*"
+        />
+      ),
+    },
+    {
+      id: 'conyuge2_ine_trasera',
+      title: 'Sube la parte trasera de la INE del segundo cónyuge',
+      description: 'Foto o escaneo de la parte trasera de la identificación oficial (INE o IFE)',
+      component: (props: any) => (
+        <FileUploadQuestion
+          {...props}
+          tramiteId={tramiteId}
+          tipoDocumento="INE_CONYUGE_2_TRASERA"
           acceptedTypes="image/*"
         />
       ),
@@ -200,11 +231,56 @@ export default function DivorcioTramitePage() {
       component: DateQuestion,
     },
     {
-      id: 'matrimonio_lugar',
-      title: '¿Dónde se casaron?',
-      description: 'Ciudad y Estado donde se celebró el matrimonio',
+      id: 'matrimonio_ciudad',
+      title: '¿En qué ciudad se casaron?',
+      description: 'Ciudad donde se celebró el matrimonio',
       component: (props: any) => (
-        <TextQuestion {...props} maxLength={200} />
+        <TextQuestion {...props} maxLength={100} />
+      ),
+    },
+    {
+      id: 'matrimonio_estado',
+      title: '¿En qué estado se casaron?',
+      description: 'Estado de la República Mexicana donde se celebró el matrimonio',
+      component: (props: any) => (
+        <SelectQuestion
+          {...props}
+          options={[
+            { value: 'Aguascalientes', label: 'Aguascalientes' },
+            { value: 'Baja California', label: 'Baja California' },
+            { value: 'Baja California Sur', label: 'Baja California Sur' },
+            { value: 'Campeche', label: 'Campeche' },
+            { value: 'Chiapas', label: 'Chiapas' },
+            { value: 'Chihuahua', label: 'Chihuahua' },
+            { value: 'Coahuila', label: 'Coahuila' },
+            { value: 'Colima', label: 'Colima' },
+            { value: 'Ciudad de México', label: 'Ciudad de México' },
+            { value: 'Durango', label: 'Durango' },
+            { value: 'Guanajuato', label: 'Guanajuato' },
+            { value: 'Guerrero', label: 'Guerrero' },
+            { value: 'Hidalgo', label: 'Hidalgo' },
+            { value: 'Jalisco', label: 'Jalisco' },
+            { value: 'Estado de México', label: 'Estado de México' },
+            { value: 'Michoacán', label: 'Michoacán' },
+            { value: 'Morelos', label: 'Morelos' },
+            { value: 'Nayarit', label: 'Nayarit' },
+            { value: 'Nuevo León', label: 'Nuevo León' },
+            { value: 'Oaxaca', label: 'Oaxaca' },
+            { value: 'Puebla', label: 'Puebla' },
+            { value: 'Querétaro', label: 'Querétaro' },
+            { value: 'Quintana Roo', label: 'Quintana Roo' },
+            { value: 'San Luis Potosí', label: 'San Luis Potosí' },
+            { value: 'Sinaloa', label: 'Sinaloa' },
+            { value: 'Sonora', label: 'Sonora' },
+            { value: 'Tabasco', label: 'Tabasco' },
+            { value: 'Tamaulipas', label: 'Tamaulipas' },
+            { value: 'Tlaxcala', label: 'Tlaxcala' },
+            { value: 'Veracruz', label: 'Veracruz' },
+            { value: 'Yucatán', label: 'Yucatán' },
+            { value: 'Zacatecas', label: 'Zacatecas' },
+          ]}
+          placeholder="Selecciona el estado"
+        />
       ),
     },
     {
@@ -238,13 +314,23 @@ export default function DivorcioTramitePage() {
       shouldShow: (data: any) => data.matrimonio_tieneHijos === true && data.matrimonio_numeroHijos > 0,
     },
 
-    // Guardia y custodia (solo si tienen hijos)
+    // Nota: guardia_custodia siempre es "Compartida" en divorcio voluntario
+
+    // ¿Con quién vivirá el menor?
     {
-      id: 'guardia_custodia',
-      title: '¿Cómo será la guardia y custodia de los hijos?',
-      description: 'Por ejemplo: Compartida, Con el padre, Con la madre',
+      id: 'menor_vivira_con',
+      title: '¿Con quién vivirá el menor habitualmente?',
+      description: 'Especifica con cuál de los padres vivirá el menor la mayor parte del tiempo',
       component: (props: any) => (
-        <TextQuestion {...props} maxLength={200} />
+        <SelectQuestion
+          {...props}
+          options={[
+            { value: 'Padre', label: 'Con el padre' },
+            { value: 'Madre', label: 'Con la madre' },
+            { value: 'Ambos', label: 'Con ambos (semanas alternas)' },
+          ]}
+          placeholder="Selecciona una opción"
+        />
       ),
       shouldShow: (data: any) => data.matrimonio_tieneHijos === true,
     },
@@ -253,9 +339,22 @@ export default function DivorcioTramitePage() {
     {
       id: 'convivencia_dias',
       title: '¿Qué días convivirá el menor con cada padre?',
-      description: 'Especifica días de la semana, fines de semana, etc.',
+      description: 'Selecciona los días de la semana (puedes seleccionar múltiples opciones)',
       component: (props: any) => (
-        <TextQuestion {...props} maxLength={500} />
+        <CheckboxGroupQuestion
+          {...props}
+          options={[
+            { value: 'lunes', label: 'Lunes' },
+            { value: 'martes', label: 'Martes' },
+            { value: 'miercoles', label: 'Miércoles' },
+            { value: 'jueves', label: 'Jueves' },
+            { value: 'viernes', label: 'Viernes' },
+            { value: 'sabado', label: 'Sábado' },
+            { value: 'domingo', label: 'Domingo' },
+            { value: 'fines_semana', label: 'Fines de semana alternos' },
+            { value: 'semanas_alternas', label: 'Semanas alternas' },
+          ]}
+        />
       ),
       shouldShow: (data: any) => data.matrimonio_tieneHijos === true,
     },
@@ -266,7 +365,11 @@ export default function DivorcioTramitePage() {
       title: '¿Cuáles serán los horarios de entrega y recogida del menor?',
       description: 'Horarios específicos para la entrega y recogida',
       component: (props: any) => (
-        <TextQuestion {...props} maxLength={300} />
+        <TextQuestion
+          {...props}
+          maxLength={300}
+          helpText="Ejemplo: Viernes a las 18:00 hrs se entregará al padre, y domingo a las 20:00 hrs se devolverá a la madre."
+        />
       ),
       shouldShow: (data: any) => data.matrimonio_tieneHijos === true,
     },
@@ -275,9 +378,23 @@ export default function DivorcioTramitePage() {
     {
       id: 'convivencia_vacaciones',
       title: '¿Cómo será la convivencia en vacaciones y días festivos?',
-      description: 'Vacaciones escolares, navidad, semana santa, etc.',
+      description: 'Selecciona el régimen de convivencia para vacaciones escolares, navidad, semana santa, etc.',
       component: (props: any) => (
-        <TextQuestion {...props} maxLength={500} />
+        <RadioQuestion
+          {...props}
+          options={[
+            {
+              value: 'Compartida',
+              label: 'Compartida',
+              description: 'Los menores convivirán de manera equitativa con ambos padres durante los períodos vacacionales, dividiéndose el tiempo de forma proporcional.',
+            },
+            {
+              value: 'Alternada',
+              label: 'Alternada',
+              description: 'Los menores convivirán con cada padre en períodos vacacionales alternados (un año con el padre, el siguiente con la madre).',
+            },
+          ]}
+        />
       ),
       shouldShow: (data: any) => data.matrimonio_tieneHijos === true,
     },
@@ -285,10 +402,10 @@ export default function DivorcioTramitePage() {
     // Gastos médicos
     {
       id: 'gastos_medicos',
-      title: '¿Quién será responsable de los gastos médicos?',
-      description: 'Especifica cómo se dividirán los gastos médicos',
+      title: '¿Quién será responsable de los gastos médicos del menor?',
+      description: 'Selecciona quién cubrirá los gastos médicos (consultas, medicamentos, emergencias, etc.)',
       component: (props: any) => (
-        <TextQuestion {...props} maxLength={300} />
+        <GastosQuestion {...props} tipo="medicos" />
       ),
       shouldShow: (data: any) => data.matrimonio_tieneHijos === true,
     },
@@ -296,32 +413,20 @@ export default function DivorcioTramitePage() {
     // Gastos escolares
     {
       id: 'gastos_escolares',
-      title: '¿Quién será responsable de los gastos escolares?',
-      description: 'Especifica cómo se dividirán los gastos escolares',
+      title: '¿Quién será responsable de los gastos escolares del menor?',
+      description: 'Los gastos escolares incluyen: inscripción, colegiatura, materiales escolares, uniformes, libros y útiles necesarios para su educación.',
       component: (props: any) => (
-        <TextQuestion {...props} maxLength={300} />
+        <GastosQuestion {...props} tipo="escolares" />
       ),
       shouldShow: (data: any) => data.matrimonio_tieneHijos === true,
     },
 
-    // Pensión alimenticia - Monto
+    // Pensión alimenticia
     {
-      id: 'pension_monto',
-      title: '¿Cuál será el monto de la pensión alimenticia mensual?',
-      description: 'Monto en pesos mexicanos (MXN)',
-      component: (props: any) => (
-        <NumberQuestion {...props} min={0} max={1000000} />
-      ),
-      shouldShow: (data: any) => data.matrimonio_tieneHijos === true,
-    },
-
-    // Pensión alimenticia - Responsable
-    {
-      id: 'pension_responsable',
-      title: '¿Quién será responsable de pagar la pensión alimenticia?',
-      component: (props: any) => (
-        <TextQuestion {...props} maxLength={200} />
-      ),
+      id: 'pension_alimenticia',
+      title: 'Pensión alimenticia',
+      description: 'Especifica el monto mensual y quién será responsable de proveerla',
+      component: PensionQuestion,
       shouldShow: (data: any) => data.matrimonio_tieneHijos === true,
     },
 

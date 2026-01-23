@@ -1,5 +1,69 @@
 import { Document, Page, Text, View, StyleSheet, Image } from '@react-pdf/renderer'
 
+// Helper function to format convivencia_dias
+const formatConvivenciaDias = (dias: string | string[] | undefined): string => {
+  if (!dias) return 'A determinar'
+  if (typeof dias === 'string') return dias
+
+  const diasMap: { [key: string]: string } = {
+    lunes: 'Lunes',
+    martes: 'Martes',
+    miercoles: 'Miércoles',
+    jueves: 'Jueves',
+    viernes: 'Viernes',
+    sabado: 'Sábado',
+    domingo: 'Domingo',
+    fines_semana: 'Fines de semana alternos',
+    semanas_alternas: 'Semanas alternas',
+  }
+
+  return dias.map((d) => diasMap[d] || d).join(', ')
+}
+
+// Helper function to format gastos (medicos/escolares)
+const formatGastos = (gastos: string | { tipo: string; porcentajePadre?: number; porcentajeMadre?: number } | undefined): string => {
+  if (!gastos) return 'Se dividirán conforme a lo acordado por las partes.'
+  if (typeof gastos === 'string') return gastos
+
+  if (gastos.tipo === 'Compartida' && gastos.porcentajePadre && gastos.porcentajeMadre) {
+    return `Compartida: ${gastos.porcentajePadre}% el padre, ${gastos.porcentajeMadre}% la madre`
+  }
+
+  return gastos.tipo
+}
+
+// Helper function to format pension
+const formatPension = (
+  pension?: { monto: number; responsable: string; porcentajePadre?: number; porcentajeMadre?: number },
+  legacyMonto?: number,
+  legacyResponsable?: string
+): { monto: string; responsable: string } => {
+  // Use new format if available
+  if (pension) {
+    const montoStr = `$${pension.monto.toFixed(2)} MXN`
+
+    if (pension.responsable === 'Compartida' && pension.porcentajePadre && pension.porcentajeMadre) {
+      const montoPadre = ((pension.monto * pension.porcentajePadre) / 100).toFixed(2)
+      const montoMadre = ((pension.monto * pension.porcentajeMadre) / 100).toFixed(2)
+      return {
+        monto: montoStr,
+        responsable: `Compartida: el padre aportará ${pension.porcentajePadre}% ($${montoPadre} MXN) y la madre aportará ${pension.porcentajeMadre}% ($${montoMadre} MXN)`,
+      }
+    }
+
+    return {
+      monto: montoStr,
+      responsable: pension.responsable || 'A determinar',
+    }
+  }
+
+  // Fallback to legacy format
+  return {
+    monto: legacyMonto ? `$${legacyMonto.toFixed(2)} MXN` : 'A determinar',
+    responsable: legacyResponsable || 'A determinar',
+  }
+}
+
 // Estilos para el documento
 const styles = StyleSheet.create({
   page: {
@@ -69,7 +133,8 @@ interface ConvenioDivorcioProps {
 
     // Matrimonio
     matrimonio_fecha: string
-    matrimonio_lugar: string
+    matrimonio_ciudad: string
+    matrimonio_estado: string
     matrimonio_tieneHijos: boolean
     matrimonio_numeroHijos?: number
 
@@ -81,12 +146,20 @@ interface ConvenioDivorcioProps {
     }>
 
     // Convivencia y pensión (solo si tienen hijos)
-    guardia_custodia?: string
-    convivencia_dias?: string
+    // guardia_custodia is always "Compartida" for voluntary divorce
+    menor_vivira_con?: string
+    convivencia_dias?: string | string[]
     convivencia_horarios?: string
     convivencia_vacaciones?: string
-    gastos_medicos?: string
-    gastos_escolares?: string
+    gastos_medicos?: string | { tipo: string; porcentajePadre?: number; porcentajeMadre?: number }
+    gastos_escolares?: string | { tipo: string; porcentajePadre?: number; porcentajeMadre?: number }
+    pension_alimenticia?: {
+      monto: number
+      responsable: string
+      porcentajePadre?: number
+      porcentajeMadre?: number
+    }
+    // Legacy fields (old format)
     pension_monto?: number
     pension_responsable?: string
 
@@ -170,7 +243,7 @@ export function ConvenioDivorcio({ datos }: ConvenioDivorcioProps) {
           <Text style={styles.indent}>
             <Text style={styles.bold}>I.-</Text> Como lo acreditamos con la documental que agregamos
             al presente escrito, con fecha {fechaMatrimonio}, los suscritos contrajimos matrimonio en{' '}
-            {datos.matrimonio_lugar || '[LUGAR MATRIMONIO]'}, bajo el régimen de Separación de Bienes.
+            {datos.matrimonio_ciudad || '[CIUDAD]'}, {datos.matrimonio_estado || '[ESTADO]'}, bajo el régimen de Separación de Bienes.
           </Text>
         </View>
 
@@ -197,22 +270,27 @@ export function ConvenioDivorcio({ datos }: ConvenioDivorcioProps) {
               hemos convenido lo siguiente:{'\n\n'}
 
               <Text style={styles.bold}>a) GUARDIA Y CUSTODIA:</Text> La guardia y custodia de los menores será{' '}
-              {datos.guardia_custodia || 'determinada conforme a la autoridad competente'}.{'\n\n'}
+              Compartida. El menor vivirá habitualmente con {datos.menor_vivira_con || 'el padre/la madre'}.{'\n\n'}
 
               <Text style={styles.bold}>b) RÉGIMEN DE CONVIVENCIA:{'\n'}</Text>
-              <Text>• Días de convivencia: {datos.convivencia_dias || 'A determinar'}{'\n'}</Text>
+              <Text>• Días de convivencia: {formatConvivenciaDias(datos.convivencia_dias)}{'\n'}</Text>
               <Text>• Horarios de entrega y recogida: {datos.convivencia_horarios || 'A determinar'}{'\n'}</Text>
               <Text>• Vacaciones y días festivos: {datos.convivencia_vacaciones || 'A determinar'}{'\n\n'}</Text>
 
-              <Text style={styles.bold}>c) GASTOS MÉDICOS:</Text> {datos.gastos_medicos || 'Se dividirán conforme a lo acordado por las partes.'}{'\n\n'}
+              <Text style={styles.bold}>c) GASTOS MÉDICOS:</Text> {formatGastos(datos.gastos_medicos)}{'\n\n'}
 
-              <Text style={styles.bold}>d) GASTOS ESCOLARES:</Text> {datos.gastos_escolares || 'Se dividirán conforme a lo acordado por las partes.'}{'\n\n'}
+              <Text style={styles.bold}>d) GASTOS ESCOLARES:</Text> {formatGastos(datos.gastos_escolares)}{'\n\n'}
 
-              <Text style={styles.bold}>e) PENSIÓN ALIMENTICIA:</Text> La parte responsable{' '}
-              {datos.pension_responsable ? `(${datos.pension_responsable})` : ''} se obliga a proporcionar
-              una pensión alimenticia mensual por la cantidad de ${datos.pension_monto ? datos.pension_monto.toLocaleString('es-MX') : '_______'} MXN
-              ({datos.pension_monto ? 'pesos mexicanos' : 'a determinar'}), que será depositada
-              en la cuenta bancaria que se designe, durante los primeros cinco días de cada mes.
+              {(() => {
+                const pension = formatPension(datos.pension_alimenticia, datos.pension_monto, datos.pension_responsable)
+                return (
+                  <>
+                    <Text style={styles.bold}>e) PENSIÓN ALIMENTICIA:</Text> {pension.responsable} se obliga a proporcionar
+                    una pensión alimenticia mensual por la cantidad de {pension.monto}, que será depositada
+                    en la cuenta bancaria que se designe, durante los primeros cinco días de cada mes.
+                  </>
+                )
+              })()}
             </Text>
           </View>
         )}
