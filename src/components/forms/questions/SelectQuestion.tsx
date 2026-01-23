@@ -1,7 +1,6 @@
 'use client'
 
 import { StepComponentProps } from '../OneQuestionWizard'
-import { Label } from '@/components/ui/label'
 
 interface SelectQuestionProps extends StepComponentProps {
   options: { value: string; label: string }[]
@@ -12,7 +11,10 @@ export function SelectQuestion({
   value,
   onChange,
   options,
-  placeholder = 'Selecciona una opción'
+  placeholder = 'Selecciona una opción',
+  onNext,
+  error,
+  allData,
 }: SelectQuestionProps) {
   return (
     <div className="space-y-4">

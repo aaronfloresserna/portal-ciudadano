@@ -2,13 +2,12 @@
 
 import { useState, useEffect } from 'react'
 import { StepComponentProps } from '../OneQuestionWizard'
-import { Input } from '@/components/ui/input'
 
 interface GastosQuestionProps extends StepComponentProps {
   tipo: 'medicos' | 'escolares'
 }
 
-export function GastosQuestion({ value, onChange, tipo }: GastosQuestionProps) {
+export function GastosQuestion({ value, onChange, tipo, onNext, error, allData }: GastosQuestionProps) {
   const [selectedOption, setSelectedOption] = useState<string>('')
   const [porcentajePadre, setPorcentajePadre] = useState<number>(50)
   const [porcentajeMadre, setPorcentajeMadre] = useState<number>(50)

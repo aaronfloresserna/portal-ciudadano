@@ -1,8 +1,6 @@
 'use client'
 
-import { useState } from 'react'
 import { StepComponentProps } from '../OneQuestionWizard'
-import { Label } from '@/components/ui/label'
 
 interface CheckboxGroupQuestionProps extends StepComponentProps {
   options: { value: string; label: string }[]
@@ -12,6 +10,9 @@ export function CheckboxGroupQuestion({
   value,
   onChange,
   options,
+  onNext,
+  error,
+  allData,
 }: CheckboxGroupQuestionProps) {
   const selectedValues = value || []
 

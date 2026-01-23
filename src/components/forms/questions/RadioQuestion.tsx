@@ -6,7 +6,7 @@ interface RadioQuestionProps extends StepComponentProps {
   options: { value: string; label: string; description?: string }[]
 }
 
-export function RadioQuestion({ value, onChange, options }: RadioQuestionProps) {
+export function RadioQuestion({ value, onChange, options, onNext, error, allData }: RadioQuestionProps) {
   return (
     <div className="space-y-3">
       {options.map((option) => {

@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { StepComponentProps } from '../OneQuestionWizard'
 import { Input } from '@/components/ui/input'
 
-export function PensionQuestion({ value, onChange }: StepComponentProps) {
+export function PensionQuestion({ value, onChange, onNext, error, allData }: StepComponentProps) {
   const [monto, setMonto] = useState<number>(0)
   const [responsable, setResponsable] = useState<string>('')
   const [porcentajePadre, setPorcentajePadre] = useState<number>(50)
