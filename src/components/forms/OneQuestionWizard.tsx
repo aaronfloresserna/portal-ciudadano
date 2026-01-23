@@ -112,18 +112,18 @@ export function OneQuestionWizard({
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-2xl mx-auto px-4">
+    <div className="min-h-screen bg-tsj-bg py-12">
+      <div className="max-w-3xl mx-auto px-4">
         {/* Progress Bar */}
-        <div className="mb-8">
-          <div className="flex justify-between items-center mb-2">
-            <span className="text-sm text-black">
+        <div className="mb-10">
+          <div className="flex justify-between items-center mb-3">
+            <span className="text-base font-semibold text-tsj-title">
               {Math.round(progress)}% completado
             </span>
           </div>
-          <div className="w-full bg-gray-200 rounded-full h-2">
+          <div className="w-full bg-white rounded-full h-3 shadow-inner">
             <div
-              className="bg-tsj-title h-2 rounded-full transition-all duration-300"
+              className="bg-tsj-title h-3 rounded-full transition-all duration-500 ease-out shadow-sm"
               style={{ width: `${progress}%` }}
             />
           </div>
@@ -155,13 +155,13 @@ export function OneQuestionWizard({
         </Card>
 
         {/* Navigation Buttons */}
-        <div className="flex justify-between gap-4">
+        <div className="flex justify-between gap-4 mt-8">
           <Button
             type="button"
             variant="outline"
             onClick={handleBack}
             disabled={currentStep === 0 || isSaving}
-            className="w-32"
+            className="px-8 py-6 text-base"
           >
             ← Atrás
           </Button>
@@ -170,7 +170,7 @@ export function OneQuestionWizard({
             type="button"
             onClick={handleNext}
             disabled={!data[step.id] || isSaving}
-            className="w-32"
+            className="px-8 py-6 text-base"
           >
             {isSaving
               ? 'Guardando...'
@@ -181,7 +181,7 @@ export function OneQuestionWizard({
         </div>
 
         {/* Help text */}
-        <p className="text-center text-sm text-black mt-6">
+        <p className="text-center text-sm text-gray-600 mt-8">
           Tu progreso se guarda automáticamente. Puedes regresar en cualquier momento.
         </p>
       </div>
