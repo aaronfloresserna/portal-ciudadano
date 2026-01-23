@@ -1,21 +1,27 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #f2f2f2;
+  --foreground: #000000;
 
-  /* Colores del PAN (Partido Acción Nacional) */
-  --pan-blue: #003DA5;
-  --pan-blue-dark: #002b75;
-  --pan-blue-light: #0052d9;
+  /* Colores del Tribunal Supremo Judicial de Chihuahua */
+  --tsj-primary: #c4b9db;
+  --tsj-primary-solid: #c4b9db;
+  --tsj-secondary: #e3d7ff;
+  --tsj-bg: #f2f2f2;
+  --tsj-yellow: #cad800;
+  --tsj-black: #000000;
+  --tsj-white: #ffffff;
+  --tsj-title: #662d91;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --color-pan-blue: var(--pan-blue);
-  --color-pan-blue-dark: var(--pan-blue-dark);
-  --color-pan-blue-light: var(--pan-blue-light);
+  --color-tsj-primary: var(--tsj-primary);
+  --color-tsj-secondary: var(--tsj-secondary);
+  --color-tsj-yellow: var(--tsj-yellow);
+  --color-tsj-title: var(--tsj-title);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }

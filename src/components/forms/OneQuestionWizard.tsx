@@ -117,16 +117,13 @@ export function OneQuestionWizard({
         {/* Progress Bar */}
         <div className="mb-8">
           <div className="flex justify-between items-center mb-2">
-            <span className="text-sm font-medium text-black">
-              Paso {currentStep + 1} de {steps.length}
-            </span>
             <span className="text-sm text-black">
               {Math.round(progress)}% completado
             </span>
           </div>
           <div className="w-full bg-gray-200 rounded-full h-2">
             <div
-              className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+              className="bg-tsj-title h-2 rounded-full transition-all duration-300"
               style={{ width: `${progress}%` }}
             />
           </div>
