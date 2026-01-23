@@ -231,7 +231,7 @@ export default function DivorcioTramitePage() {
       component: (props: any) => (
         <HijosFormQuestion
           {...props}
-          numeroHijos={tramite?.datos?.matrimonio_numeroHijos || 1}
+          numeroHijos={props.allData?.matrimonio_numeroHijos || 1}
           tramiteId={tramiteId}
         />
       ),

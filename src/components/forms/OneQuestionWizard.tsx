@@ -17,6 +17,7 @@ export interface StepComponentProps {
   onChange: (value: any) => void
   onNext: () => void
   error?: string
+  allData?: any
 }
 
 interface OneQuestionWizardProps {
@@ -134,9 +135,9 @@ export function OneQuestionWizard({
         {/* Question Card */}
         <Card className="mb-6">
           <CardHeader>
-            <CardTitle>{step.title}</CardTitle>
+            <CardTitle className="text-black font-bold">{step.title}</CardTitle>
             {step.description && (
-              <CardDescription>{step.description}</CardDescription>
+              <CardDescription className="text-black">{step.description}</CardDescription>
             )}
           </CardHeader>
           <CardContent>
@@ -151,6 +152,7 @@ export function OneQuestionWizard({
               onChange={handleValueChange}
               onNext={handleNext}
               error={error}
+              allData={dataRef.current}
             />
           </CardContent>
         </Card>

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { StepComponentProps } from '../OneQuestionWizard'
@@ -28,6 +28,25 @@ export function HijosFormQuestion({ value, onChange, numeroHijos, tramiteId }: H
   )
   const [isUploading, setIsUploading] = useState<{ [key: number]: boolean }>({})
   const [uploadError, setUploadError] = useState<{ [key: number]: string }>({})
+
+  // Ajustar el array cuando cambie el número de hijos
+  useEffect(() => {
+    if (numeroHijos !== hijos.length) {
+      const nuevosHijos = Array.from({ length: numeroHijos }, (_, index) => {
+        if (hijos[index]) {
+          return hijos[index]
+        }
+        return {
+          nombre: '',
+          fechaNacimiento: '',
+          edad: 0,
+          actaNacimiento: null,
+        }
+      })
+      setHijos(nuevosHijos)
+      onChange(nuevosHijos)
+    }
+  }, [numeroHijos])
 
   const calcularEdad = (fechaNacimiento: string): number => {
     if (!fechaNacimiento) return 0
