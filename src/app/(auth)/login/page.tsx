@@ -46,19 +46,19 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-tsj-bg py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-tsj-bg py-12 px-4 sm:px-6 lg:px-8">
       {/* Logo y título */}
-      <div className="absolute top-8 left-1/2 transform -translate-x-1/2 flex flex-col items-center">
+      <div className="flex flex-col items-center mb-8">
         <img
           src="/logos/logo-stj.png"
           alt="Tribunal Superior de Justicia del Estado de Chihuahua"
-          className="h-24 w-auto mb-4"
+          className="h-28 w-auto mb-4"
         />
         <h1 className="text-2xl font-bold text-tsj-title">Portal Ciudadano</h1>
         <p className="text-sm text-black">Trámites Administrativos sin Litis</p>
       </div>
 
-      <Card className="w-full max-w-md mt-32 backdrop-blur-sm">
+      <Card className="w-full max-w-md backdrop-blur-sm">
         <CardHeader className="space-y-3 text-center pb-8">
           <CardTitle className="text-3xl">Bienvenido</CardTitle>
           <CardDescription className="text-base">
