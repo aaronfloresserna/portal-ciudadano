@@ -67,21 +67,51 @@ export default function DivorcioTramitePage() {
   }
 
   const handleComplete = async (data: any) => {
-    // Marcar como completado
-    await fetch(`/api/tramites/${tramiteId}`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({
-        estado: 'COMPLETADO',
-        datos: data,
-      }),
-    })
+    const miRol = tramite.miRol
+    const estado = tramite.estado
 
-    // Redirigir a confirmación
-    router.push(`/tramites/divorcio/${tramiteId}/confirmacion`)
+    // Verificar si el usuario está completando sus datos personales
+    const esCompletandoDatosPersonales =
+      (miRol === 'SOLICITANTE' && !tramite.conyuge1Completado) ||
+      (miRol === 'CONYUGE' && !tramite.conyuge2Completado)
+
+    if (esCompletandoDatosPersonales) {
+      // Marcar datos como completados
+      await fetch(`/api/tramites/${tramiteId}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          datos: data,
+          marcarDatosCompletados: true,
+        }),
+      })
+
+      // Redirigir según rol
+      if (miRol === 'SOLICITANTE') {
+        router.push(`/tramites/divorcio/${tramiteId}/invitar`)
+      } else {
+        router.push(`/tramites/divorcio/${tramiteId}/confirmacion`)
+      }
+    } else {
+      // Completar el trámite completo
+      await fetch(`/api/tramites/${tramiteId}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          estado: 'COMPLETADO',
+          datos: data,
+        }),
+      })
+
+      // Redirigir a confirmación
+      router.push(`/tramites/divorcio/${tramiteId}/confirmacion`)
+    }
   }
 
   if (isLoading) {
@@ -100,13 +130,14 @@ export default function DivorcioTramitePage() {
     )
   }
 
-  const steps = [
+  const allSteps = [
     // PASO 1: Bienvenida
     {
       id: 'bienvenida',
       title: '¡Bienvenido al trámite de Divorcio Voluntario!',
       description: 'Te guiaremos paso a paso para completar tu trámite de forma sencilla.',
       component: WelcomeStep,
+      rol: null, // Visible para todos
     },
 
     // CÓNYUGE 1 (Pasos 2-6)
@@ -117,6 +148,7 @@ export default function DivorcioTramitePage() {
       component: (props: any) => (
         <TextQuestion {...props} maxLength={100} validateName />
       ),
+      rol: 'SOLICITANTE',
     },
     {
       id: 'conyuge1_apellidos',
@@ -125,6 +157,7 @@ export default function DivorcioTramitePage() {
       component: (props: any) => (
         <TextQuestion {...props} maxLength={100} validateName />
       ),
+      rol: 'SOLICITANTE',
     },
     {
       id: 'conyuge1_curp',
@@ -133,11 +166,13 @@ export default function DivorcioTramitePage() {
       component: (props: any) => (
         <TextQuestion {...props} maxLength={18} minLength={18} validateCURP />
       ),
+      rol: 'SOLICITANTE',
     },
     {
       id: 'conyuge1_fechaNacimiento',
       title: 'Fecha de nacimiento del primer cónyuge',
       component: DateQuestion,
+      rol: 'SOLICITANTE',
     },
     {
       id: 'conyuge1_ine_frontal',
@@ -151,6 +186,7 @@ export default function DivorcioTramitePage() {
           acceptedTypes="image/*"
         />
       ),
+      rol: 'SOLICITANTE',
     },
     {
       id: 'conyuge1_ine_trasera',
@@ -164,6 +200,7 @@ export default function DivorcioTramitePage() {
           acceptedTypes="image/*"
         />
       ),
+      rol: 'SOLICITANTE',
     },
 
     // CÓNYUGE 2 (Pasos 7-11)
@@ -174,6 +211,7 @@ export default function DivorcioTramitePage() {
       component: (props: any) => (
         <TextQuestion {...props} maxLength={100} validateName />
       ),
+      rol: 'CONYUGE',
     },
     {
       id: 'conyuge2_apellidos',
@@ -182,6 +220,7 @@ export default function DivorcioTramitePage() {
       component: (props: any) => (
         <TextQuestion {...props} maxLength={100} validateName />
       ),
+      rol: 'CONYUGE',
     },
     {
       id: 'conyuge2_curp',
@@ -190,11 +229,13 @@ export default function DivorcioTramitePage() {
       component: (props: any) => (
         <TextQuestion {...props} maxLength={18} minLength={18} validateCURP />
       ),
+      rol: 'CONYUGE',
     },
     {
       id: 'conyuge2_fechaNacimiento',
       title: 'Fecha de nacimiento del segundo cónyuge',
       component: DateQuestion,
+      rol: 'CONYUGE',
     },
     {
       id: 'conyuge2_ine_frontal',
@@ -208,6 +249,7 @@ export default function DivorcioTramitePage() {
           acceptedTypes="image/*"
         />
       ),
+      rol: 'CONYUGE',
     },
     {
       id: 'conyuge2_ine_trasera',
@@ -221,6 +263,7 @@ export default function DivorcioTramitePage() {
           acceptedTypes="image/*"
         />
       ),
+      rol: 'CONYUGE',
     },
 
     // MATRIMONIO (Pasos 12-14)
@@ -229,6 +272,7 @@ export default function DivorcioTramitePage() {
       title: '¿Cuándo se casaron?',
       description: 'Fecha de celebración del matrimonio',
       component: DateQuestion,
+      rol: null,
     },
     {
       id: 'matrimonio_ciudad',
@@ -237,6 +281,7 @@ export default function DivorcioTramitePage() {
       component: (props: any) => (
         <TextQuestion {...props} maxLength={100} />
       ),
+      rol: null,
     },
     {
       id: 'matrimonio_estado',
@@ -282,11 +327,13 @@ export default function DivorcioTramitePage() {
           placeholder="Selecciona el estado"
         />
       ),
+      rol: null,
     },
     {
       id: 'matrimonio_tieneHijos',
       title: '¿Tienen hijos en común?',
       component: YesNoQuestion,
+      rol: null,
     },
 
     // Condicional: Si tienen hijos
@@ -297,6 +344,7 @@ export default function DivorcioTramitePage() {
         <NumberQuestion {...props} min={1} max={20} />
       ),
       shouldShow: (data: any) => data.matrimonio_tieneHijos === true,
+      rol: null,
     },
 
     // Formulario de datos de cada hijo
@@ -312,6 +360,7 @@ export default function DivorcioTramitePage() {
         />
       ),
       shouldShow: (data: any) => data.matrimonio_tieneHijos === true && data.matrimonio_numeroHijos > 0,
+      rol: null,
     },
 
     // Nota: guardia_custodia siempre es "Compartida" en divorcio voluntario
@@ -333,6 +382,7 @@ export default function DivorcioTramitePage() {
         />
       ),
       shouldShow: (data: any) => data.matrimonio_tieneHijos === true,
+      rol: null,
     },
 
     // Convivencia - Días específicos
@@ -357,6 +407,7 @@ export default function DivorcioTramitePage() {
         />
       ),
       shouldShow: (data: any) => data.matrimonio_tieneHijos === true,
+      rol: null,
     },
 
     // Convivencia - Horarios
@@ -372,6 +423,7 @@ export default function DivorcioTramitePage() {
         />
       ),
       shouldShow: (data: any) => data.matrimonio_tieneHijos === true,
+      rol: null,
     },
 
     // Convivencia - Vacaciones
@@ -397,6 +449,7 @@ export default function DivorcioTramitePage() {
         />
       ),
       shouldShow: (data: any) => data.matrimonio_tieneHijos === true,
+      rol: null,
     },
 
     // Gastos médicos
@@ -408,6 +461,7 @@ export default function DivorcioTramitePage() {
         <GastosQuestion {...props} tipo="medicos" />
       ),
       shouldShow: (data: any) => data.matrimonio_tieneHijos === true,
+      rol: null,
     },
 
     // Gastos escolares
@@ -419,6 +473,7 @@ export default function DivorcioTramitePage() {
         <GastosQuestion {...props} tipo="escolares" />
       ),
       shouldShow: (data: any) => data.matrimonio_tieneHijos === true,
+      rol: null,
     },
 
     // Pensión alimenticia
@@ -428,6 +483,7 @@ export default function DivorcioTramitePage() {
       description: 'Especifica el monto mensual y quién será responsable de proveerla',
       component: PensionQuestion,
       shouldShow: (data: any) => data.matrimonio_tieneHijos === true,
+      rol: null,
     },
 
     // DOMICILIO (Para el convenio)
@@ -438,6 +494,7 @@ export default function DivorcioTramitePage() {
       component: (props: any) => (
         <TextQuestion {...props} maxLength={200} />
       ),
+      rol: null,
     },
     {
       id: 'domicilio_numero',
@@ -445,6 +502,7 @@ export default function DivorcioTramitePage() {
       component: (props: any) => (
         <TextQuestion {...props} maxLength={20} />
       ),
+      rol: null,
     },
     {
       id: 'domicilio_colonia',
@@ -452,6 +510,7 @@ export default function DivorcioTramitePage() {
       component: (props: any) => (
         <TextQuestion {...props} maxLength={100} />
       ),
+      rol: null,
     },
 
     // DOCUMENTOS (Pasos 15-17)
@@ -467,6 +526,7 @@ export default function DivorcioTramitePage() {
           acceptedTypes="image/*,.pdf"
         />
       ),
+      rol: null,
     },
 
     // FIRMAS (Pasos 18-20)
@@ -475,6 +535,7 @@ export default function DivorcioTramitePage() {
       title: `Firma del primer cónyuge`,
       description: 'Se grabará tu imagen mientras firmas como evidencia legal',
       component: SignatureQuestion,
+      rol: null,
     },
     {
       id: 'aviso_firma_conyuge2',
@@ -486,14 +547,40 @@ export default function DivorcioTramitePage() {
           customMessage="Ahora es momento de que el segundo cónyuge firme el convenio. Por favor entrega el dispositivo para continuar."
         />
       ),
+      rol: null,
     },
     {
       id: 'firma_conyuge2',
       title: `Firma del segundo cónyuge`,
       description: 'Se grabará tu imagen mientras firmas como evidencia legal',
       component: SignatureQuestion,
+      rol: null,
     },
   ]
+
+  // Filtrar pasos según el estado del trámite y el rol del usuario
+  let steps = allSteps
+
+  const miRol = tramite.miRol
+  const estado = tramite.estado
+
+  if (estado === 'BORRADOR' || estado === 'ESPERANDO_CONYUGE_2') {
+    // Mostrar solo los pasos del rol correspondiente
+    steps = allSteps.filter((paso: any) => {
+      // Pasos sin rol específico son visibles para todos
+      if (!paso.rol) return true
+      // Mostrar solo pasos que coincidan con mi rol
+      return paso.rol === miRol
+    })
+  } else if (estado === 'EN_PROGRESO') {
+    // Mostrar solo pasos compartidos (sin rol específico o pasos de matrimonio/firma)
+    steps = allSteps.filter((paso: any) => {
+      // Pasos sin rol específico son compartidos
+      if (!paso.rol) return true
+      // Filtrar pasos individuales de cónyuge1 y cónyuge2
+      return false
+    })
+  }
 
   return (
     <OneQuestionWizard

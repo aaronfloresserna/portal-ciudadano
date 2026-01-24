@@ -20,11 +20,25 @@ export async function POST(
       )
     }
 
+    // Verificar que el usuario es participante del trámite
+    const participante = await prisma.tramiteParticipante.findFirst({
+      where: {
+        tramiteId: params.id,
+        usuarioId: userId,
+      },
+    })
+
+    if (!participante) {
+      return NextResponse.json(
+        { error: 'Trámite no encontrado o sin acceso' },
+        { status: 404 }
+      )
+    }
+
     // Obtener el trámite con todos los datos
-    const tramite = await prisma.tramite.findFirst({
+    const tramite = await prisma.tramite.findUnique({
       where: {
         id: params.id,
-        usuarioId: userId,
       },
     })
 

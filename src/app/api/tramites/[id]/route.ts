@@ -18,14 +18,38 @@ export async function GET(
       )
     }
 
-    const tramite = await prisma.tramite.findFirst({
+    // Verificar que el usuario es participante del trámite
+    const participante = await prisma.tramiteParticipante.findFirst({
       where: {
-        id: params.id,
+        tramiteId: params.id,
         usuarioId: userId,
       },
+    })
+
+    if (!participante) {
+      return NextResponse.json(
+        { error: 'Trámite no encontrado o sin acceso' },
+        { status: 404 }
+      )
+    }
+
+    // Obtener el trámite con todas sus relaciones
+    const tramite = await prisma.tramite.findUnique({
+      where: { id: params.id },
       include: {
         documentos: true,
         expediente: true,
+        participantes: {
+          include: {
+            usuario: {
+              select: {
+                id: true,
+                nombre: true,
+                email: true,
+              },
+            },
+          },
+        },
       },
     })
 
@@ -38,7 +62,11 @@ export async function GET(
 
     return NextResponse.json({
       success: true,
-      tramite,
+      tramite: {
+        ...tramite,
+        miRol: participante.rol,
+        miEstadoDatos: participante.estadoDatos,
+      },
     })
   } catch (error) {
     console.error('Error al obtener trámite:', error)
@@ -65,12 +93,23 @@ export async function PATCH(
       )
     }
 
-    // Verificar que el trámite pertenece al usuario
-    const tramiteExistente = await prisma.tramite.findFirst({
+    // Verificar que el usuario es participante del trámite
+    const participante = await prisma.tramiteParticipante.findFirst({
       where: {
-        id: params.id,
+        tramiteId: params.id,
         usuarioId: userId,
       },
+    })
+
+    if (!participante) {
+      return NextResponse.json(
+        { error: 'Trámite no encontrado o sin acceso' },
+        { status: 404 }
+      )
+    }
+
+    const tramiteExistente = await prisma.tramite.findUnique({
+      where: { id: params.id },
     })
 
     if (!tramiteExistente) {
@@ -81,7 +120,38 @@ export async function PATCH(
     }
 
     const body = await request.json()
-    const { pasoActual, datos, estado } = body
+    const { pasoActual, datos, estado, marcarDatosCompletados } = body
+
+    // Validar permisos según rol y estado del trámite
+    if (datos && tramiteExistente.estado !== 'EN_PROGRESO') {
+      const datosKeys = Object.keys(datos)
+
+      // Si es SOLICITANTE, no puede editar campos de conyuge2
+      if (participante.rol === 'SOLICITANTE') {
+        const camposProhibidos = datosKeys.filter((key) =>
+          key.startsWith('conyuge2_')
+        )
+        if (camposProhibidos.length > 0) {
+          return NextResponse.json(
+            { error: 'No tienes permiso para editar los datos del otro cónyuge' },
+            { status: 403 }
+          )
+        }
+      }
+
+      // Si es CONYUGE, no puede editar campos de conyuge1
+      if (participante.rol === 'CONYUGE') {
+        const camposProhibidos = datosKeys.filter((key) =>
+          key.startsWith('conyuge1_')
+        )
+        if (camposProhibidos.length > 0) {
+          return NextResponse.json(
+            { error: 'No tienes permiso para editar los datos del otro cónyuge' },
+            { status: 403 }
+          )
+        }
+      }
+    }
 
     // Hacer merge de los datos nuevos con los existentes
     const datosActualizados = {
@@ -89,13 +159,39 @@ export async function PATCH(
       ...(datos || {}),
     }
 
+    // Preparar actualizaciones
+    const actualizaciones: any = {
+      ...(pasoActual !== undefined && { pasoActual }),
+      ...(datos && { datos: datosActualizados }),
+      ...(estado && { estado }),
+    }
+
+    // Si se marca como datos completados
+    if (marcarDatosCompletados) {
+      if (participante.rol === 'SOLICITANTE') {
+        actualizaciones.conyuge1Completado = true
+        actualizaciones.estado = 'ESPERANDO_CONYUGE_2'
+
+        // Actualizar estado del participante
+        await prisma.tramiteParticipante.update({
+          where: { id: participante.id },
+          data: { estadoDatos: 'COMPLETADO' },
+        })
+      } else if (participante.rol === 'CONYUGE') {
+        actualizaciones.conyuge2Completado = true
+        actualizaciones.estado = 'EN_PROGRESO'
+
+        // Actualizar estado del participante
+        await prisma.tramiteParticipante.update({
+          where: { id: participante.id },
+          data: { estadoDatos: 'COMPLETADO' },
+        })
+      }
+    }
+
     const tramite = await prisma.tramite.update({
       where: { id: params.id },
-      data: {
-        ...(pasoActual !== undefined && { pasoActual }),
-        ...(datos && { datos: datosActualizados }),
-        ...(estado && { estado }),
-      },
+      data: actualizaciones,
     })
 
     return NextResponse.json({
@@ -127,18 +223,19 @@ export async function DELETE(
       )
     }
 
-    // Verificar que el trámite pertenece al usuario
-    const tramite = await prisma.tramite.findFirst({
+    // Verificar que el usuario es SOLICITANTE del trámite (solo el solicitante puede eliminar)
+    const participante = await prisma.tramiteParticipante.findFirst({
       where: {
-        id: params.id,
+        tramiteId: params.id,
         usuarioId: userId,
+        rol: 'SOLICITANTE',
       },
     })
 
-    if (!tramite) {
+    if (!participante) {
       return NextResponse.json(
-        { error: 'Trámite no encontrado' },
-        { status: 404 }
+        { error: 'Solo el solicitante puede eliminar el trámite' },
+        { status: 403 }
       )
     }
 

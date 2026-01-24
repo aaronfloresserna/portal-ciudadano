@@ -34,17 +34,17 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Verificar que el trámite pertenece al usuario
-    const tramite = await prisma.tramite.findFirst({
+    // Verificar que el usuario es participante del trámite
+    const participante = await prisma.tramiteParticipante.findFirst({
       where: {
-        id: tramiteId,
+        tramiteId,
         usuarioId: userId,
       },
     })
 
-    if (!tramite) {
+    if (!participante) {
       return NextResponse.json(
-        { error: 'Trámite no encontrado' },
+        { error: 'Trámite no encontrado o sin acceso' },
         { status: 404 }
       )
     }
@@ -122,17 +122,17 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    // Verificar que el trámite pertenece al usuario
-    const tramite = await prisma.tramite.findFirst({
+    // Verificar que el usuario es participante del trámite
+    const participante = await prisma.tramiteParticipante.findFirst({
       where: {
-        id: tramiteId,
+        tramiteId,
         usuarioId: userId,
       },
     })
 
-    if (!tramite) {
+    if (!participante) {
       return NextResponse.json(
-        { error: 'Trámite no encontrado' },
+        { error: 'Trámite no encontrado o sin acceso' },
         { status: 404 }
       )
     }

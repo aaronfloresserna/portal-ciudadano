@@ -14,14 +14,36 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    const tramites = await prisma.tramite.findMany({
+    // Buscar trámites donde el usuario es participante
+    const participaciones = await prisma.tramiteParticipante.findMany({
       where: { usuarioId: userId },
       include: {
-        documentos: true,
-        expediente: true,
+        tramite: {
+          include: {
+            documentos: true,
+            expediente: true,
+            participantes: {
+              include: {
+                usuario: {
+                  select: {
+                    id: true,
+                    nombre: true,
+                    email: true,
+                  },
+                },
+              },
+            },
+          },
+        },
       },
       orderBy: { createdAt: 'desc' },
     })
+
+    const tramites = participaciones.map((p) => ({
+      ...p.tramite,
+      miRol: p.rol,
+      miEstadoDatos: p.estadoDatos,
+    }))
 
     return NextResponse.json({
       success: true,
@@ -51,20 +73,34 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const { tipo = 'DIVORCIO_VOLUNTARIO' } = body
 
-    // Crear el trámite
-    const tramite = await prisma.tramite.create({
-      data: {
-        usuarioId: userId,
-        tipo,
-        estado: 'BORRADOR',
-        pasoActual: 1,
-        datos: {},
-      },
+    // Usar transacción para crear el trámite y el participante
+    const resultado = await prisma.$transaction(async (tx) => {
+      // Crear el trámite
+      const tramite = await tx.tramite.create({
+        data: {
+          tipo,
+          estado: 'BORRADOR',
+          pasoActual: 1,
+          datos: {},
+        },
+      })
+
+      // Crear el participante con rol SOLICITANTE
+      await tx.tramiteParticipante.create({
+        data: {
+          tramiteId: tramite.id,
+          usuarioId: userId,
+          rol: 'SOLICITANTE',
+          estadoDatos: 'PENDIENTE',
+        },
+      })
+
+      return tramite
     })
 
     return NextResponse.json({
       success: true,
-      tramite,
+      tramite: resultado,
     }, { status: 201 })
   } catch (error) {
     console.error('Error al crear trámite:', error)

@@ -18,26 +18,35 @@ model Usuario {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  tramites  Tramite[]
+  // Relaciones del sistema dual de usuarios
+  participaciones        TramiteParticipante[]
+  notificaciones         Notificacion[]
+  invitacionesEnviadas   Invitacion[] @relation("InvitacionSolicitante")
+  invitacionesRecibidas  Invitacion[] @relation("InvitacionInvitado")
 
   @@map("usuarios")
 }
 
 model Tramite {
   id          String   @id @default(cuid())
-  usuarioId   String
   tipo        String   @default("DIVORCIO_VOLUNTARIO")
-  estado      String   @default("BORRADOR") // BORRADOR, COMPLETADO
-  pasoActual  Int      @default(1) // 1-5
+  estado      String   @default("BORRADOR") // BORRADOR, ESPERANDO_CONYUGE_2, EN_PROGRESO, COMPLETADO
+  pasoActual  Int      @default(1)
   datos       Json     @default("{}") // Almacenar todos los datos del formulario
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  usuario     Usuario     @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
-  documentos  Documento[]
-  expediente  Expediente?
+  // Estado de completitud de datos personales
+  conyuge1Completado Boolean @default(false)
+  conyuge2Completado Boolean @default(false)
 
-  @@index([usuarioId])
+  // Relaciones del sistema dual de usuarios
+  participantes  TramiteParticipante[]
+  documentos     Documento[]
+  expediente     Expediente?
+  invitaciones   Invitacion[]
+  notificaciones Notificacion[]
+
   @@index([estado])
   @@map("tramites")
 }
@@ -68,4 +77,62 @@ model Expediente {
   tramite     Tramite  @relation(fields: [tramiteId], references: [id], onDelete: Cascade)
 
   @@map("expedientes")
+}
+
+model TramiteParticipante {
+  id            String   @id @default(cuid())
+  tramiteId     String
+  usuarioId     String
+  rol           String   // "SOLICITANTE" | "CONYUGE"
+  estadoDatos   String   @default("PENDIENTE") // "PENDIENTE" | "COMPLETADO"
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  tramite       Tramite  @relation(fields: [tramiteId], references: [id], onDelete: Cascade)
+  usuario       Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  @@unique([tramiteId, usuarioId])
+  @@index([tramiteId])
+  @@index([usuarioId])
+  @@map("tramite_participantes")
+}
+
+model Invitacion {
+  id            String   @id @default(cuid())
+  tramiteId     String
+  solicitanteId String
+  invitadoId    String?
+  emailInvitado String
+  token         String   @unique
+  estado        String   @default("PENDIENTE") // "PENDIENTE" | "ACEPTADA" | "RECHAZADA" | "EXPIRADA"
+  expiraEn      DateTime
+  createdAt     DateTime @default(now())
+  aceptadaEn    DateTime?
+
+  tramite       Tramite  @relation(fields: [tramiteId], references: [id], onDelete: Cascade)
+  solicitante   Usuario  @relation("InvitacionSolicitante", fields: [solicitanteId], references: [id])
+  invitado      Usuario? @relation("InvitacionInvitado", fields: [invitadoId], references: [id])
+
+  @@index([tramiteId])
+  @@index([token])
+  @@index([emailInvitado])
+  @@map("invitaciones")
+}
+
+model Notificacion {
+  id          String   @id @default(cuid())
+  usuarioId   String
+  tramiteId   String?
+  tipo        String   // "INVITACION" | "PROGRESO" | "COMPLETADO" | "SISTEMA"
+  titulo      String
+  mensaje     String
+  leida       Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  usuario     Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  tramite     Tramite? @relation(fields: [tramiteId], references: [id], onDelete: Cascade)
+
+  @@index([usuarioId])
+  @@index([leida])
+  @@map("notificaciones")
 }

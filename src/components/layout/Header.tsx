@@ -1,4 +1,7 @@
+'use client'
+
 import Link from 'next/link'
+import { NotificationBell } from './NotificationBell'
 
 export function Header() {
   return (
@@ -44,6 +47,9 @@ export function Header() {
             >
               Auxiliares Judiciales
             </Link>
+            <div className="bg-white/10 rounded-full">
+              <NotificationBell />
+            </div>
           </nav>
         </div>
       </div>
