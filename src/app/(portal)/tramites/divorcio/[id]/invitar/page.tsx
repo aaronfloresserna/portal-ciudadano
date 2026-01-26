@@ -15,6 +15,14 @@ export default function InvitarPage() {
   const [error, setError] = useState('')
   const [exito, setExito] = useState(false)
   const [tramite, setTramite] = useState<any>(null)
+  const [linkInvitacion, setLinkInvitacion] = useState('')
+  const [copiado, setCopiado] = useState(false)
+
+  const copiarLink = () => {
+    navigator.clipboard.writeText(linkInvitacion)
+    setCopiado(true)
+    setTimeout(() => setCopiado(false), 2000)
+  }
 
   useEffect(() => {
     if (!token) {
@@ -75,13 +83,13 @@ export default function InvitarPage() {
         throw new Error(data.error || 'Error al enviar invitación')
       }
 
+      // Generar el link de invitación con el token
+      const appUrl = window.location.origin
+      const link = `${appUrl}/invitacion/aceptar?token=${data.token}`
+      setLinkInvitacion(link)
+
       setExito(true)
       setEmailInvitado('')
-
-      // Redirigir al dashboard después de 3 segundos
-      setTimeout(() => {
-        router.push('/dashboard')
-      }, 3000)
     } catch (error: any) {
       setError(error.message)
     } finally {
@@ -135,34 +143,129 @@ export default function InvitarPage() {
           {/* Body */}
           <div className="px-6 py-8">
             {exito ? (
-              <div className="text-center">
-                <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 mb-4">
-                  <svg
-                    className="h-8 w-8 text-green-600"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth={1.5}
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                    />
-                  </svg>
+              <div className="space-y-6">
+                <div className="text-center">
+                  <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 mb-4">
+                    <svg
+                      className="h-8 w-8 text-green-600"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth={1.5}
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
+                    </svg>
+                  </div>
+                  <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                    Invitación Generada
+                  </h2>
+                  <p className="text-gray-600 mb-4">
+                    Comparte el siguiente enlace con <strong>{emailInvitado}</strong> para que pueda completar sus datos personales.
+                  </p>
                 </div>
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">
-                  Invitación Enviada
-                </h2>
-                <p className="text-gray-600 mb-4">
-                  Se ha enviado un correo electrónico a{' '}
-                  <strong>{emailInvitado}</strong> con las instrucciones para
-                  continuar el trámite.
-                </p>
-                <p className="text-sm text-gray-500">
-                  Redirigiendo al dashboard...
-                </p>
+
+                <div className="bg-blue-50 border-l-4 border-blue-400 p-4">
+                  <div className="flex">
+                    <div className="flex-shrink-0">
+                      <svg
+                        className="h-5 w-5 text-blue-400"
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    </div>
+                    <div className="ml-3">
+                      <h3 className="text-sm font-medium text-blue-800">
+                        Enlace de Invitación
+                      </h3>
+                      <p className="text-sm text-blue-700 mt-1">
+                        Copia este enlace y envíaselo al segundo cónyuge por WhatsApp, email o cualquier otro medio.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Enlace de invitación
+                  </label>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      readOnly
+                      value={linkInvitacion}
+                      className="flex-1 px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-700 text-sm font-mono"
+                      onClick={(e) => (e.target as HTMLInputElement).select()}
+                    />
+                    <button
+                      type="button"
+                      onClick={copiarLink}
+                      className="px-6 py-3 bg-tsj-primary text-white rounded-lg font-medium hover:bg-tsj-secondary transition-colors flex items-center gap-2"
+                    >
+                      {copiado ? (
+                        <>
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            strokeWidth={1.5}
+                            stroke="currentColor"
+                            className="w-5 h-5"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                            />
+                          </svg>
+                          Copiado
+                        </>
+                      ) : (
+                        <>
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            strokeWidth={1.5}
+                            stroke="currentColor"
+                            className="w-5 h-5"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              d="M15.666 3.888A2.25 2.25 0 0013.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 01-.75.75H9a.75.75 0 01-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 01-2.25 2.25H6.75A2.25 2.25 0 014.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 011.927-.184"
+                            />
+                          </svg>
+                          Copiar
+                        </>
+                      )}
+                    </button>
+                  </div>
+                  <p className="text-xs text-gray-500">
+                    Este enlace expirará en 7 días
+                  </p>
+                </div>
+
+                <div className="flex gap-4 pt-4">
+                  <button
+                    type="button"
+                    onClick={() => router.push('/dashboard')}
+                    className="flex-1 bg-tsj-primary text-white px-6 py-3 rounded-lg font-medium hover:bg-tsj-secondary transition-colors"
+                  >
+                    Ir al Dashboard
+                  </button>
+                </div>
               </div>
             ) : (
               <>
@@ -193,8 +296,7 @@ export default function InvitarPage() {
                             que tu cónyuge complete sus datos personales.
                           </p>
                           <p className="mt-2">
-                            Ingresa su correo electrónico y le enviaremos una
-                            invitación para que pueda acceder al trámite.
+                            Ingresa su correo electrónico y generaremos un enlace de invitación que podrás compartir con él/ella.
                           </p>
                         </div>
                       </div>
@@ -219,8 +321,7 @@ export default function InvitarPage() {
                         placeholder="ejemplo@correo.com"
                       />
                       <p className="mt-2 text-sm text-gray-500">
-                        Enviaremos un correo con un enlace para que pueda
-                        completar sus datos
+                        Generaremos un enlace que podrás compartir manualmente con tu cónyuge
                       </p>
                     </div>
 

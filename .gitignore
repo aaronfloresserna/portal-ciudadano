@@ -48,3 +48,5 @@ next-env.d.ts
 
 # uploads
 /public/uploads/
+build.log
+verify-deployment.sh
