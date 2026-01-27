@@ -7,7 +7,6 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  // Force regeneration: 2026-01-27 21:45 - remove cached columns
 }
 
 model Usuario {
@@ -36,11 +35,6 @@ model Tramite {
   datos       Json     @default("{}") // Almacenar todos los datos del formulario
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-
-  // Estado de completitud de datos personales
-  // TEMPORALMENTE COMENTADO - usar datos json
-  // conyuge1Completado Boolean @default(false)
-  // conyuge2Completado Boolean @default(false)
 
   // Relaciones del sistema dual de usuarios
   participantes  TramiteParticipante[]
