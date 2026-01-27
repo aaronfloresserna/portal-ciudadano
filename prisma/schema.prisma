@@ -7,7 +7,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  // Force regeneration: 2026-01-27 20:52
+  // Force regeneration: 2026-01-27 21:45 - remove cached columns
 }
 
 model Usuario {
