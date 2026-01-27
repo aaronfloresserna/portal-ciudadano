@@ -71,9 +71,7 @@ export default function DivorcioTramitePage() {
     const estado = tramite.estado
 
     // Verificar si el usuario está completando sus datos personales
-    const esCompletandoDatosPersonales =
-      (miRol === 'SOLICITANTE' && !tramite.conyuge1Completado) ||
-      (miRol === 'CONYUGE' && !tramite.conyuge2Completado)
+    const esCompletandoDatosPersonales = tramite.miEstadoDatos === 'PENDIENTE'
 
     if (esCompletandoDatosPersonales) {
       // Marcar datos como completados

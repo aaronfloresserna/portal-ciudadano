@@ -169,7 +169,7 @@ export async function PATCH(
     // Si se marca como datos completados
     if (marcarDatosCompletados) {
       if (participante.rol === 'SOLICITANTE') {
-        actualizaciones.conyuge1Completado = true
+        // actualizaciones.conyuge1Completado = true // COMENTADO TEMPORALMENTE
         actualizaciones.estado = 'ESPERANDO_CONYUGE_2'
 
         // Actualizar estado del participante
@@ -178,7 +178,7 @@ export async function PATCH(
           data: { estadoDatos: 'COMPLETADO' },
         })
       } else if (participante.rol === 'CONYUGE') {
-        actualizaciones.conyuge2Completado = true
+        // actualizaciones.conyuge2Completado = true // COMENTADO TEMPORALMENTE
         actualizaciones.estado = 'EN_PROGRESO'
 
         // Actualizar estado del participante

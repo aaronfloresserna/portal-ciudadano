@@ -38,8 +38,9 @@ model Tramite {
   updatedAt   DateTime @updatedAt
 
   // Estado de completitud de datos personales
-  conyuge1Completado Boolean @default(false)
-  conyuge2Completado Boolean @default(false)
+  // TEMPORALMENTE COMENTADO - usar datos json
+  // conyuge1Completado Boolean @default(false)
+  // conyuge2Completado Boolean @default(false)
 
   // Relaciones del sistema dual de usuarios
   participantes  TramiteParticipante[]
