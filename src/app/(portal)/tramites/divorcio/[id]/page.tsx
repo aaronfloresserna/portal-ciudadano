@@ -411,8 +411,8 @@ export default function DivorcioTramitePage() {
     // Convivencia - Horarios
     {
       id: 'convivencia_horarios',
-      title: '¿Cuáles serán los horarios de entrega y recogida del menor?',
-      description: 'Horarios específicos para la entrega y recogida',
+      title: '¿Cuáles serán los horarios de entrega y recogida del menor? (opcional)',
+      description: 'Horarios específicos para la entrega y recogida. Este campo no es obligatorio.',
       component: (props: any) => (
         <TextQuestion
           {...props}
@@ -421,6 +421,7 @@ export default function DivorcioTramitePage() {
         />
       ),
       shouldShow: (data: any) => data.matrimonio_tieneHijos === true,
+      optional: true,
       rol: null,
     },
 

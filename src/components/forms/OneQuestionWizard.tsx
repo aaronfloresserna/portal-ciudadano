@@ -10,6 +10,7 @@ interface Step {
   description?: string
   component: React.ComponentType<StepComponentProps>
   shouldShow?: (data: any) => boolean
+  optional?: boolean
 }
 
 export interface StepComponentProps {
@@ -169,7 +170,7 @@ export function OneQuestionWizard({
           <Button
             type="button"
             onClick={handleNext}
-            disabled={!data[step.id] || isSaving}
+            disabled={(!data[step.id] && !step.optional) || isSaving}
             className="px-8 py-6 text-base"
           >
             {isSaving

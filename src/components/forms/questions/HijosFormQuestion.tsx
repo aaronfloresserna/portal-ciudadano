@@ -46,7 +46,8 @@ export function HijosFormQuestion({ value, onChange, numeroHijos, tramiteId }: H
       setHijos(nuevosHijos)
       onChange(nuevosHijos)
     }
-  }, [numeroHijos])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [numeroHijos, hijos.length])
 
   const calcularEdad = (fechaNacimiento: string): number => {
     if (!fechaNacimiento) return 0
