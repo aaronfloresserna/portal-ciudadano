@@ -30,14 +30,21 @@ export default function NuevoDivorcioPage() {
 
         const data = await response.json()
 
-        if (data.success) {
+        if (!response.ok) {
+          console.error('Error en respuesta del API:', data)
+          throw new Error(data.error || 'Error al crear trámite')
+        }
+
+        if (data.success && data.tramite?.id) {
           // Redirigir al formulario del trámite
           router.push(`/tramites/divorcio/${data.tramite.id}`)
         } else {
-          throw new Error(data.error)
+          console.error('Respuesta sin success o sin ID de trámite:', data)
+          throw new Error('Respuesta inválida del servidor')
         }
-      } catch (error) {
-        console.error('Error al crear trámite:', error)
+      } catch (error: any) {
+        console.error('Error al crear trámite:', error.message || error)
+        alert('Error al crear el trámite: ' + (error.message || 'Error desconocido'))
         router.push('/dashboard')
       }
     }

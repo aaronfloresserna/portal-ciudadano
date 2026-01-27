@@ -64,11 +64,14 @@ export async function POST(request: NextRequest) {
     const userId = getUserIdFromRequest(request)
 
     if (!userId) {
+      console.error('POST /api/tramites - No autorizado: userId no encontrado')
       return NextResponse.json(
         { error: 'No autorizado' },
         { status: 401 }
       )
     }
+
+    console.log('POST /api/tramites - Creando trámite para userId:', userId)
 
     const body = await request.json()
     const { tipo = 'DIVORCIO_VOLUNTARIO' } = body
@@ -85,6 +88,8 @@ export async function POST(request: NextRequest) {
         },
       })
 
+      console.log('POST /api/tramites - Trámite creado:', tramite.id)
+
       // Crear el participante con rol SOLICITANTE
       await tx.tramiteParticipante.create({
         data: {
@@ -95,17 +100,23 @@ export async function POST(request: NextRequest) {
         },
       })
 
+      console.log('POST /api/tramites - Participante creado para trámite:', tramite.id)
+
       return tramite
     })
+
+    console.log('POST /api/tramites - Éxito, retornando trámite:', resultado.id)
 
     return NextResponse.json({
       success: true,
       tramite: resultado,
     }, { status: 201 })
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error al crear trámite:', error)
+    console.error('Error stack:', error.stack)
+    console.error('Error message:', error.message)
     return NextResponse.json(
-      { error: 'Error al crear trámite' },
+      { error: 'Error al crear trámite', details: error.message },
       { status: 500 }
     )
   }
