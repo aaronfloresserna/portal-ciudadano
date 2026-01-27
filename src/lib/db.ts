@@ -21,3 +21,4 @@ export const prisma =
   })
 
 if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma
+// Force serverless invalidation Tue Jan 27 14:59:09 CST 2026
