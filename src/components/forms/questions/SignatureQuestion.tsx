@@ -5,7 +5,12 @@ import SignatureCanvas from 'react-signature-canvas'
 import { Button } from '@/components/ui/button'
 import { StepComponentProps } from '../OneQuestionWizard'
 
-export function SignatureQuestion({ value, onChange, onNext }: StepComponentProps) {
+interface SignatureQuestionProps extends StepComponentProps {
+  manifestationText?: string
+  manifestationTitle?: string
+}
+
+export function SignatureQuestion({ value, onChange, onNext, manifestationText, manifestationTitle }: SignatureQuestionProps) {
   const sigCanvas = useRef<SignatureCanvas>(null)
   const videoRef = useRef<HTMLVideoElement>(null)
   const [cameraActive, setCameraActive] = useState(false)
@@ -81,6 +86,21 @@ export function SignatureQuestion({ value, onChange, onNext }: StepComponentProp
 
   return (
     <div className="space-y-6">
+      {/* Leyenda de manifestación de voluntad */}
+      {manifestationText && (
+        <div className="bg-yellow-50 border-2 border-yellow-400 rounded-lg p-5">
+          <h3 className="font-bold text-yellow-900 text-lg mb-3">
+            {manifestationTitle || 'Manifestación de Voluntad'}
+          </h3>
+          <p className="text-sm text-yellow-900 leading-relaxed whitespace-pre-line">
+            {manifestationText}
+          </p>
+          <p className="text-xs text-yellow-800 mt-4 font-medium">
+            Por favor lee cuidadosamente esta declaración antes de firmar.
+          </p>
+        </div>
+      )}
+
       {/* Mensaje de instrucciones */}
       <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
         <div className="flex items-start gap-3">

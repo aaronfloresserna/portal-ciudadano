@@ -200,6 +200,15 @@ export default function DivorcioTramitePage() {
       ),
       rol: 'SOLICITANTE',
     },
+    {
+      id: 'conyuge1_correo',
+      title: 'Correo electrónico del primer cónyuge',
+      description: 'Correo electrónico válido para recibir notificaciones del trámite',
+      component: (props: any) => (
+        <TextQuestion {...props} type="email" maxLength={100} />
+      ),
+      rol: 'SOLICITANTE',
+    },
 
     // CÓNYUGE 2 (Pasos 7-11)
     {
@@ -260,6 +269,15 @@ export default function DivorcioTramitePage() {
           tipoDocumento="INE_CONYUGE_2_TRASERA"
           acceptedTypes="image/*"
         />
+      ),
+      rol: 'CONYUGE',
+    },
+    {
+      id: 'conyuge2_correo',
+      title: 'Correo electrónico del segundo cónyuge',
+      description: 'Correo electrónico válido para recibir notificaciones del trámite',
+      component: (props: any) => (
+        <TextQuestion {...props} type="email" maxLength={100} />
       ),
       rol: 'CONYUGE',
     },
@@ -327,6 +345,25 @@ export default function DivorcioTramitePage() {
       ),
       rol: null,
     },
+    // Firma de manifestación de voluntad (antes de hijos)
+    {
+      id: 'firma_manifestacion_divorcio',
+      title: 'Manifestación de voluntad de divorcio',
+      description: 'Por favor lee cuidadosamente la declaración y firma para continuar',
+      component: (props: any) => {
+        const nombre1 = props.allData?.conyuge1_nombre || '_______'
+        const nombre2 = props.allData?.conyuge2_nombre || '_______'
+
+        return (
+          <SignatureQuestion
+            {...props}
+            manifestationTitle="Manifestación de Voluntad de Divorcio"
+            manifestationText={`Yo, ${nombre1}, por mi propio derecho y bajo protesta de decir verdad, manifiesto que es mi voluntad libre, expresa y consciente disolver el vínculo matrimonial que me une con ${nombre2}, solicitando de manera voluntaria la tramitación del divorcio conforme a derecho, sin que exista dolo, error, violencia o mala fe en mi consentimiento. Asimismo, declaro que conozco los efectos legales del divorcio y que esta manifestación se realiza de manera espontánea.`}
+          />
+        )
+      },
+      rol: null,
+    },
     {
       id: 'matrimonio_tieneHijos',
       title: '¿Tienen hijos en común?',
@@ -358,6 +395,27 @@ export default function DivorcioTramitePage() {
         />
       ),
       shouldShow: (data: any) => data.matrimonio_tieneHijos === true && data.matrimonio_numeroHijos > 0,
+      rol: null,
+    },
+
+    // Firma después de datos de hijos
+    {
+      id: 'firma_confirmacion_hijos',
+      title: 'Confirmación de datos de hijos',
+      description: 'Firma para confirmar que los datos de los hijos son correctos',
+      component: (props: any) => {
+        const nombre1 = props.allData?.conyuge1_nombre || '_______'
+        const nombre2 = props.allData?.conyuge2_nombre || '_______'
+
+        return (
+          <SignatureQuestion
+            {...props}
+            manifestationTitle="Confirmación de Datos"
+            manifestationText={`Yo, ${nombre1}, confirmo que la información proporcionada sobre nuestros hijos es correcta y verdadera. Declaro conocer las responsabilidades que esto conlleva y que esta confirmación se realiza de manera voluntaria.`}
+          />
+        )
+      },
+      shouldShow: (data: any) => data.matrimonio_tieneHijos === true,
       rol: null,
     },
 
@@ -528,12 +586,22 @@ export default function DivorcioTramitePage() {
       rol: null,
     },
 
-    // FIRMAS (Pasos 18-20)
+    // FIRMAS FINALES - Ratificación del convenio
     {
       id: 'firma_conyuge1',
-      title: `Firma del primer cónyuge`,
-      description: 'Se grabará tu imagen mientras firmas como evidencia legal',
-      component: SignatureQuestion,
+      title: 'Ratificación del convenio - Primer cónyuge',
+      description: 'Firma para ratificar el convenio de alimentos y convivencia',
+      component: (props: any) => {
+        const nombre1 = props.allData?.conyuge1_nombre || '_______'
+
+        return (
+          <SignatureQuestion
+            {...props}
+            manifestationTitle="Manifestación de Voluntad y Ratificación de Convenio"
+            manifestationText={`Yo, ${nombre1}, por mi propio derecho y bajo protesta de decir verdad, ratifico en todas y cada una de sus partes el convenio de alimentos y convivencias que fue generado a través del portal habilitado para tal efecto, reconociendo su contenido, alcances y efectos legales, y manifestando que el mismo fue aceptado de manera voluntaria, sin dolo, error, violencia o mala fe. Declaro conocer las consecuencias jurídicas del divorcio y del convenio que ratifico, firmando la presente de manera espontánea.`}
+          />
+        )
+      },
       rol: null,
     },
     {
@@ -550,9 +618,19 @@ export default function DivorcioTramitePage() {
     },
     {
       id: 'firma_conyuge2',
-      title: `Firma del segundo cónyuge`,
-      description: 'Se grabará tu imagen mientras firmas como evidencia legal',
-      component: SignatureQuestion,
+      title: 'Ratificación del convenio - Segundo cónyuge',
+      description: 'Firma para ratificar el convenio de alimentos y convivencia',
+      component: (props: any) => {
+        const nombre2 = props.allData?.conyuge2_nombre || '_______'
+
+        return (
+          <SignatureQuestion
+            {...props}
+            manifestationTitle="Manifestación de Voluntad y Ratificación de Convenio"
+            manifestationText={`Yo, ${nombre2}, por mi propio derecho y bajo protesta de decir verdad, ratifico en todas y cada una de sus partes el convenio de alimentos y convivencias que fue generado a través del portal habilitado para tal efecto, reconociendo su contenido, alcances y efectos legales, y manifestando que el mismo fue aceptado de manera voluntaria, sin dolo, error, violencia o mala fe. Declaro conocer las consecuencias jurídicas del divorcio y del convenio que ratifico, firmando la presente de manera espontánea.`}
+          />
+        )
+      },
       rol: null,
     },
   ]
