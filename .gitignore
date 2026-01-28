@@ -50,3 +50,8 @@ next-env.d.ts
 /public/uploads/
 build.log
 verify-deployment.sh
+
+# Playwright
+/test-results/
+/playwright-report/
+/playwright/.cache/
