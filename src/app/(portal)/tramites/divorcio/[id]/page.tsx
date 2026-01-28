@@ -17,6 +17,8 @@ import { CheckboxGroupQuestion } from '@/components/forms/questions/CheckboxGrou
 import { RadioQuestion } from '@/components/forms/questions/RadioQuestion'
 import { GastosQuestion } from '@/components/forms/questions/GastosQuestion'
 import { PensionQuestion } from '@/components/forms/questions/PensionQuestion'
+import { DireccionQuestion } from '@/components/forms/questions/DireccionQuestion'
+import { ciudadesPorEstado } from '@/lib/ciudadesPorEstado'
 
 export default function DivorcioTramitePage() {
   const router = useRouter()
@@ -210,93 +212,12 @@ export default function DivorcioTramitePage() {
       rol: 'SOLICITANTE',
     },
 
-    // CÓNYUGE 2 (Pasos 7-11)
-    {
-      id: 'conyuge2_nombre',
-      title: '¿Cuál es el nombre del segundo cónyuge?',
-      description: 'Solo el nombre o nombres (sin apellidos)',
-      component: (props: any) => (
-        <TextQuestion {...props} maxLength={100} validateName />
-      ),
-      rol: 'CONYUGE',
-    },
-    {
-      id: 'conyuge2_apellidos',
-      title: '¿Cuáles son los apellidos del segundo cónyuge?',
-      description: 'Apellido paterno y materno',
-      component: (props: any) => (
-        <TextQuestion {...props} maxLength={100} validateName />
-      ),
-      rol: 'CONYUGE',
-    },
-    {
-      id: 'conyuge2_curp',
-      title: 'CURP del segundo cónyuge',
-      description: '18 caracteres que aparecen en la identificación oficial',
-      component: (props: any) => (
-        <TextQuestion {...props} maxLength={18} minLength={18} validateCURP />
-      ),
-      rol: 'CONYUGE',
-    },
-    {
-      id: 'conyuge2_fechaNacimiento',
-      title: 'Fecha de nacimiento del segundo cónyuge',
-      component: DateQuestion,
-      rol: 'CONYUGE',
-    },
-    {
-      id: 'conyuge2_ine_frontal',
-      title: 'Sube la parte frontal de la INE del segundo cónyuge',
-      description: 'Foto o escaneo de la parte frontal de la identificación oficial (INE o IFE)',
-      component: (props: any) => (
-        <FileUploadQuestion
-          {...props}
-          tramiteId={tramiteId}
-          tipoDocumento="INE_CONYUGE_2_FRONTAL"
-          acceptedTypes="image/*"
-        />
-      ),
-      rol: 'CONYUGE',
-    },
-    {
-      id: 'conyuge2_ine_trasera',
-      title: 'Sube la parte trasera de la INE del segundo cónyuge',
-      description: 'Foto o escaneo de la parte trasera de la identificación oficial (INE o IFE)',
-      component: (props: any) => (
-        <FileUploadQuestion
-          {...props}
-          tramiteId={tramiteId}
-          tipoDocumento="INE_CONYUGE_2_TRASERA"
-          acceptedTypes="image/*"
-        />
-      ),
-      rol: 'CONYUGE',
-    },
-    {
-      id: 'conyuge2_correo',
-      title: 'Correo electrónico del segundo cónyuge',
-      description: 'Correo electrónico válido para recibir notificaciones del trámite',
-      component: (props: any) => (
-        <TextQuestion {...props} type="email" maxLength={100} />
-      ),
-      rol: 'CONYUGE',
-    },
-
-    // MATRIMONIO (Pasos 12-14)
+    // MATRIMONIO - FECHA, ESTADO Y CIUDAD
     {
       id: 'matrimonio_fecha',
       title: '¿Cuándo se casaron?',
       description: 'Fecha de celebración del matrimonio',
       component: DateQuestion,
-      rol: null,
-    },
-    {
-      id: 'matrimonio_ciudad',
-      title: '¿En qué ciudad se casaron?',
-      description: 'Ciudad donde se celebró el matrimonio',
-      component: (props: any) => (
-        <TextQuestion {...props} maxLength={100} />
-      ),
       rol: null,
     },
     {
@@ -343,6 +264,31 @@ export default function DivorcioTramitePage() {
           placeholder="Selecciona el estado"
         />
       ),
+      rol: null,
+    },
+    {
+      id: 'matrimonio_ciudad',
+      title: '¿En qué ciudad se casaron?',
+      description: 'Ciudad donde se celebró el matrimonio',
+      component: (props: any) => {
+        const estado = props.allData?.matrimonio_estado
+        const ciudades = estado ? ciudadesPorEstado[estado] || [] : []
+
+        if (ciudades.length === 0) {
+          return <TextQuestion {...props} maxLength={100} />
+        }
+
+        return (
+          <SelectQuestion
+            {...props}
+            options={ciudades.map((ciudad) => ({
+              value: ciudad,
+              label: ciudad,
+            }))}
+            placeholder="Selecciona la ciudad"
+          />
+        )
+      },
       rol: null,
     },
     // Firma de manifestación de voluntad (antes de hijos)
@@ -543,30 +489,12 @@ export default function DivorcioTramitePage() {
       rol: null,
     },
 
-    // DOMICILIO (Para el convenio)
+    // DOMICILIO (Agrupado en una sola página)
     {
-      id: 'domicilio_calle',
-      title: 'Calle del domicilio para notificaciones',
-      description: 'Domicilio donde recibirán notificaciones del trámite',
-      component: (props: any) => (
-        <TextQuestion {...props} maxLength={200} />
-      ),
-      rol: null,
-    },
-    {
-      id: 'domicilio_numero',
-      title: 'Número del domicilio',
-      component: (props: any) => (
-        <TextQuestion {...props} maxLength={20} />
-      ),
-      rol: null,
-    },
-    {
-      id: 'domicilio_colonia',
-      title: 'Colonia',
-      component: (props: any) => (
-        <TextQuestion {...props} maxLength={100} />
-      ),
+      id: 'domicilio',
+      title: 'Domicilio para notificaciones',
+      description: 'Dirección donde recibirán notificaciones del trámite',
+      component: DireccionQuestion,
       rol: null,
     },
 
