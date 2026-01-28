@@ -9,6 +9,8 @@ interface FileUploadQuestionProps extends StepComponentProps {
   tipoDocumento: string
   acceptedTypes?: string
   maxSizeMB?: number
+  uploadUrl?: string
+  headers?: Record<string, string>
 }
 
 export function FileUploadQuestion({
@@ -18,6 +20,8 @@ export function FileUploadQuestion({
   tipoDocumento,
   acceptedTypes = 'image/*,.pdf',
   maxSizeMB = 2,
+  uploadUrl = '/api/documentos',
+  headers = {},
 }: FileUploadQuestionProps) {
   const [isUploading, setIsUploading] = useState(false)
   const [preview, setPreview] = useState<string | null>(value?.path || null)
@@ -57,11 +61,18 @@ export function FileUploadQuestion({
         ? JSON.parse(localStorage.getItem('auth-storage')!).state.token
         : null
 
-      const response = await fetch('/api/documentos', {
+      const requestHeaders: Record<string, string> = {
+        ...headers,
+      }
+
+      // Solo agregar Authorization si hay token y no es upload público
+      if (token && uploadUrl === '/api/documentos') {
+        requestHeaders['Authorization'] = `Bearer ${token}`
+      }
+
+      const response = await fetch(uploadUrl, {
         method: 'POST',
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: requestHeaders,
         body: formData,
       })
 

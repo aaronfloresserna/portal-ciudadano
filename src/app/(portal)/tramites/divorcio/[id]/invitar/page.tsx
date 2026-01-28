@@ -83,9 +83,9 @@ export default function InvitarPage() {
         throw new Error(data.error || 'Error al enviar invitación')
       }
 
-      // Generar el link de invitación con el token
+      // Generar el link de invitación con el token (sin login)
       const appUrl = window.location.origin
-      const link = `${appUrl}/invitacion/aceptar?token=${data.token}`
+      const link = `${appUrl}/conyuge2/${data.token}`
       setLinkInvitacion(link)
 
       setExito(true)
