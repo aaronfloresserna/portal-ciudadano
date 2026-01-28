@@ -163,7 +163,13 @@ interface ConvenioDivorcioProps {
     pension_monto?: number
     pension_responsable?: string
 
-    // Domicilio
+    // Domicilio (nuevo formato agrupado)
+    domicilio?: {
+      calle: string
+      numero: string
+      colonia: string
+    }
+    // Legacy formato separado
     domicilio_calle?: string
     domicilio_numero?: string
     domicilio_colonia?: string
@@ -181,7 +187,9 @@ export function ConvenioDivorcio({ datos }: ConvenioDivorcioProps) {
   const conyuge1 = `${datos.conyuge1_nombre || ''} ${datos.conyuge1_apellidos || ''}`.trim().toUpperCase() || 'CÓNYUGE 1'
   const conyuge2 = `${datos.conyuge2_nombre || ''} ${datos.conyuge2_apellidos || ''}`.trim().toUpperCase() || 'CÓNYUGE 2'
 
-  const domicilio = datos.domicilio_calle
+  const domicilio = datos.domicilio
+    ? `${datos.domicilio.calle} número ${datos.domicilio.numero || 'S/N'} de la colonia ${datos.domicilio.colonia || ''}`.trim()
+    : datos.domicilio_calle
     ? `${datos.domicilio_calle} número ${datos.domicilio_numero || 'S/N'} de la colonia ${datos.domicilio_colonia || ''}`.trim()
     : 'el que consta en autos'
 

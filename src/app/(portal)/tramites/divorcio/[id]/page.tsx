@@ -109,8 +109,8 @@ export default function DivorcioTramitePage() {
         }),
       })
 
-      // Redirigir a confirmación
-      router.push(`/tramites/divorcio/${tramiteId}/confirmacion`)
+      // Redirigir a página de convenio
+      router.push(`/tramites/divorcio/${tramiteId}/convenio`)
     }
   }
 
