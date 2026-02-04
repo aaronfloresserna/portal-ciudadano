@@ -7,6 +7,7 @@ import { TextQuestion } from '@/components/forms/questions/TextQuestion'
 import { DateQuestion } from '@/components/forms/questions/DateQuestion'
 import { FileUploadQuestion } from '@/components/forms/questions/FileUploadQuestion'
 import { WelcomeStep } from '@/components/forms/questions/WelcomeStep'
+import { ReviewDataQuestion } from '@/components/forms/questions/ReviewDataQuestion'
 
 export default function Conyuge2Page() {
   const router = useRouter()
@@ -100,6 +101,67 @@ export default function Conyuge2Page() {
     )
   }
 
+  // Construir las secciones de revisión si la modalidad es 'separado'
+  const buildReviewSections = () => {
+    const tramiteData = invitacion?.tramite?.datos || {}
+    const sections = []
+
+    // Sección: Datos del Matrimonio
+    sections.push({
+      title: 'Datos del Matrimonio',
+      key: 'matrimonio',
+      items: [
+        { label: 'Fecha de matrimonio', value: tramiteData.matrimonio_fecha },
+        { label: 'Estado donde se casaron', value: tramiteData.matrimonio_estado },
+        { label: 'Ciudad donde se casaron', value: tramiteData.matrimonio_estado },
+      ],
+    })
+
+    // Sección: Información sobre hijos
+    if (tramiteData.matrimonio_tieneHijos) {
+      sections.push({
+        title: 'Información sobre Hijos',
+        key: 'hijos',
+        items: [
+          { label: 'Tienen hijos en común', value: 'Sí' },
+          { label: 'Número de hijos', value: tramiteData.matrimonio_numeroHijos },
+          { label: 'Con quién vivirá el menor', value: tramiteData.menor_vivira_con },
+          { label: 'Días de convivencia', value: tramiteData.convivencia_dias },
+          { label: 'Convivencia en vacaciones', value: tramiteData.convivencia_vacaciones },
+        ],
+      })
+    }
+
+    // Sección: Gastos y Pensión
+    if (tramiteData.matrimonio_tieneHijos) {
+      sections.push({
+        title: 'Gastos y Pensión Alimenticia',
+        key: 'gastos',
+        items: [
+          { label: 'Responsable de gastos médicos', value: tramiteData.gastos_medicos },
+          { label: 'Responsable de gastos escolares', value: tramiteData.gastos_escolares },
+          { label: 'Monto de pensión alimenticia', value: tramiteData.pension_alimenticia_monto },
+          { label: 'Responsable de pensión', value: tramiteData.pension_alimenticia_responsable },
+        ],
+      })
+    }
+
+    // Sección: Domicilio
+    if (tramiteData.direccion_calle) {
+      sections.push({
+        title: 'Domicilio',
+        key: 'domicilio',
+        items: [
+          { label: 'Calle', value: tramiteData.direccion_calle },
+          { label: 'Número', value: tramiteData.direccion_numero },
+          { label: 'Colonia', value: tramiteData.direccion_colonia },
+        ],
+      })
+    }
+
+    return sections
+  }
+
   const steps = [
     {
       id: 'bienvenida',
@@ -107,6 +169,19 @@ export default function Conyuge2Page() {
       description: 'A continuación te pediremos tu información personal para continuar con el trámite de divorcio voluntario.',
       component: WelcomeStep,
     },
+    // Paso de revisión (solo si modalidad es 'separado')
+    ...(invitacion?.tramite?.datos?.modalidad_tramite === 'separado'
+      ? [
+          {
+            id: 'revision_datos',
+            title: 'Revisión de información proporcionada',
+            description: 'Por favor revisa la información que el primer cónyuge ha proporcionado',
+            component: (props: any) => (
+              <ReviewDataQuestion {...props} sections={buildReviewSections()} />
+            ),
+          },
+        ]
+      : []),
     {
       id: 'conyuge2_nombre',
       title: '¿Cuál es tu nombre?',
@@ -116,11 +191,17 @@ export default function Conyuge2Page() {
       ),
     },
     {
-      id: 'conyuge2_apellidos',
-      title: '¿Cuáles son tus apellidos?',
-      description: 'Apellido paterno y materno',
+      id: 'conyuge2_apellido_paterno',
+      title: '¿Cuál es tu apellido paterno?',
       component: (props: any) => (
-        <TextQuestion {...props} maxLength={100} validateName />
+        <TextQuestion {...props} maxLength={50} validateName />
+      ),
+    },
+    {
+      id: 'conyuge2_apellido_materno',
+      title: '¿Cuál es tu apellido materno?',
+      component: (props: any) => (
+        <TextQuestion {...props} maxLength={50} validateName />
       ),
     },
     {

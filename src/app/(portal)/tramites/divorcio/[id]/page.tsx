@@ -212,6 +212,31 @@ export default function DivorcioTramitePage() {
       rol: 'SOLICITANTE',
     },
 
+    // Pregunta: ¿Juntos o por separado?
+    {
+      id: 'modalidad_tramite',
+      title: '¿Cómo desean completar el trámite?',
+      description: 'Selecciona si ambos cónyuges completarán el formulario juntos o por separado',
+      component: (props: any) => (
+        <RadioQuestion
+          {...props}
+          options={[
+            {
+              value: 'juntos',
+              label: 'Juntos',
+              description: 'Ambos cónyuges están presentes y completarán el formulario en este momento usando el mismo dispositivo.',
+            },
+            {
+              value: 'separado',
+              label: 'Por separado',
+              description: 'El primer cónyuge completará su parte del formulario y enviará un enlace al segundo cónyuge para que revise la información y complete su parte desde otro dispositivo.',
+            },
+          ]}
+        />
+      ),
+      rol: 'SOLICITANTE',
+    },
+
     // MATRIMONIO - FECHA, ESTADO Y CIUDAD
     {
       id: 'matrimonio_fecha',
@@ -291,25 +316,6 @@ export default function DivorcioTramitePage() {
       },
       rol: null,
     },
-    // Firma de manifestación de voluntad (antes de hijos)
-    {
-      id: 'firma_manifestacion_divorcio',
-      title: 'Manifestación de voluntad de divorcio',
-      description: 'Por favor lee cuidadosamente la declaración y firma para continuar',
-      component: (props: any) => {
-        const nombre1 = props.allData?.conyuge1_nombre || '_______'
-        const nombre2 = props.allData?.conyuge2_nombre || '_______'
-
-        return (
-          <SignatureQuestion
-            {...props}
-            manifestationTitle="Manifestación de Voluntad de Divorcio"
-            manifestationText={`Yo, ${nombre1}, por mi propio derecho y bajo protesta de decir verdad, manifiesto que es mi voluntad libre, expresa y consciente disolver el vínculo matrimonial que me une con ${nombre2}, solicitando de manera voluntaria la tramitación del divorcio conforme a derecho, sin que exista dolo, error, violencia o mala fe en mi consentimiento. Asimismo, declaro que conozco los efectos legales del divorcio y que esta manifestación se realiza de manera espontánea.`}
-          />
-        )
-      },
-      rol: null,
-    },
     {
       id: 'matrimonio_tieneHijos',
       title: '¿Tienen hijos en común?',
@@ -344,27 +350,6 @@ export default function DivorcioTramitePage() {
       rol: null,
     },
 
-    // Firma después de datos de hijos
-    {
-      id: 'firma_confirmacion_hijos',
-      title: 'Confirmación de datos de hijos',
-      description: 'Firma para confirmar que los datos de los hijos son correctos',
-      component: (props: any) => {
-        const nombre1 = props.allData?.conyuge1_nombre || '_______'
-        const nombre2 = props.allData?.conyuge2_nombre || '_______'
-
-        return (
-          <SignatureQuestion
-            {...props}
-            manifestationTitle="Confirmación de Datos"
-            manifestationText={`Yo, ${nombre1}, confirmo que la información proporcionada sobre nuestros hijos es correcta y verdadera. Declaro conocer las responsabilidades que esto conlleva y que esta confirmación se realiza de manera voluntaria.`}
-          />
-        )
-      },
-      shouldShow: (data: any) => data.matrimonio_tieneHijos === true,
-      rol: null,
-    },
-
     // Nota: guardia_custodia siempre es "Compartida" en divorcio voluntario
 
     // ¿Con quién vivirá el menor?
@@ -390,7 +375,16 @@ export default function DivorcioTramitePage() {
     // Convivencia - Días específicos
     {
       id: 'convivencia_dias',
-      title: '¿Qué días convivirá el menor con cada padre?',
+      title: (data: any) => {
+        const menorViviraCon = data?.menor_vivira_con
+        if (menorViviraCon === 'Padre') {
+          return '¿Qué días convivirá el menor con la madre?'
+        } else if (menorViviraCon === 'Madre') {
+          return '¿Qué días convivirá el menor con el padre?'
+        } else {
+          return '¿Qué días convivirá el menor con cada padre?'
+        }
+      },
       description: 'Selecciona los días de la semana (puedes seleccionar múltiples opciones)',
       component: (props: any) => (
         <CheckboxGroupQuestion
@@ -448,10 +442,24 @@ export default function DivorcioTramitePage() {
               label: 'Alternada',
               description: 'Los menores convivirán con cada padre en períodos vacacionales alternados (un año con el padre, el siguiente con la madre).',
             },
+            {
+              value: 'Otro',
+              label: 'Otro acuerdo',
+              description: 'Especificar un acuerdo personalizado para la convivencia en vacaciones y días festivos.',
+            },
           ]}
         />
       ),
       shouldShow: (data: any) => data.matrimonio_tieneHijos === true,
+      rol: null,
+    },
+    // Convivencia - Vacaciones (texto personalizado)
+    {
+      id: 'convivencia_vacaciones_otro',
+      title: 'Describe el acuerdo personalizado para vacaciones y días festivos',
+      description: 'Explica detalladamente cómo será la convivencia durante vacaciones escolares, navidad, semana santa y otros días festivos',
+      component: TextQuestion,
+      shouldShow: (data: any) => data.matrimonio_tieneHijos === true && data.convivencia_vacaciones === 'Otro',
       rol: null,
     },
 
@@ -514,19 +522,47 @@ export default function DivorcioTramitePage() {
       rol: null,
     },
 
-    // FIRMAS FINALES - Ratificación del convenio
+    // FIRMAS FINALES - Primer cónyuge (manifestación + ratificación consecutivas)
     {
-      id: 'firma_conyuge1',
-      title: 'Ratificación del convenio - Primer cónyuge',
-      description: 'Firma para ratificar el convenio de alimentos y convivencia',
+      id: 'firma_manifestacion_conyuge1',
+      title: 'Manifestación de voluntad de divorcio - Primer cónyuge',
+      description: 'Por favor lee cuidadosamente la declaración y firma para continuar',
       component: (props: any) => {
         const nombre1 = props.allData?.conyuge1_nombre || '_______'
+        const apellidoPaterno1 = props.allData?.conyuge1_apellido_paterno || '_______'
+        const apellidoMaterno1 = props.allData?.conyuge1_apellido_materno || '_______'
+        const nombreCompleto1 = `${nombre1} ${apellidoPaterno1} ${apellidoMaterno1}`
+
+        const nombre2 = props.allData?.conyuge2_nombre || '_______'
+        const apellidoPaterno2 = props.allData?.conyuge2_apellido_paterno || '_______'
+        const apellidoMaterno2 = props.allData?.conyuge2_apellido_materno || '_______'
+        const nombreCompleto2 = `${nombre2} ${apellidoPaterno2} ${apellidoMaterno2}`
 
         return (
           <SignatureQuestion
             {...props}
-            manifestationTitle="Manifestación de Voluntad y Ratificación de Convenio"
-            manifestationText={`Yo, ${nombre1}, por mi propio derecho y bajo protesta de decir verdad, ratifico en todas y cada una de sus partes el convenio de alimentos y convivencias que fue generado a través del portal habilitado para tal efecto, reconociendo su contenido, alcances y efectos legales, y manifestando que el mismo fue aceptado de manera voluntaria, sin dolo, error, violencia o mala fe. Declaro conocer las consecuencias jurídicas del divorcio y del convenio que ratifico, firmando la presente de manera espontánea.`}
+            manifestationTitle="Manifestación de Voluntad de Divorcio"
+            manifestationText={`Yo, ${nombreCompleto1}, por mi propio derecho y bajo protesta de decir verdad, manifiesto que es mi voluntad libre, expresa y consciente disolver el vínculo matrimonial que me une con ${nombreCompleto2}, solicitando de manera voluntaria la tramitación del divorcio conforme a derecho, sin que exista dolo, error, violencia o mala fe en mi consentimiento. Asimismo, declaro que conozco los efectos legales del divorcio y que esta manifestación se realiza de manera voluntaria.`}
+          />
+        )
+      },
+      rol: null,
+    },
+    {
+      id: 'firma_ratificacion_conyuge1',
+      title: 'Ratificación del convenio - Primer cónyuge',
+      description: 'Firma para ratificar el convenio de alimentos y convivencia',
+      component: (props: any) => {
+        const nombre1 = props.allData?.conyuge1_nombre || '_______'
+        const apellidoPaterno1 = props.allData?.conyuge1_apellido_paterno || '_______'
+        const apellidoMaterno1 = props.allData?.conyuge1_apellido_materno || '_______'
+        const nombreCompleto1 = `${nombre1} ${apellidoPaterno1} ${apellidoMaterno1}`
+
+        return (
+          <SignatureQuestion
+            {...props}
+            manifestationTitle="Ratificación de Convenio"
+            manifestationText={`Yo, ${nombreCompleto1}, por mi propio derecho y bajo protesta de decir verdad, ratifico en todas y cada una de sus partes el convenio de alimentos y convivencias que fue generado a través del portal habilitado para tal efecto, reconociendo su contenido, alcances y efectos legales, y manifestando que el mismo fue aceptado de manera voluntaria, sin dolo, error, violencia o mala fe. Declaro conocer las consecuencias jurídicas del divorcio y del convenio que ratifico, firmando la presente de manera voluntaria.`}
           />
         )
       },
@@ -539,23 +575,51 @@ export default function DivorcioTramitePage() {
       component: (props: any) => (
         <WelcomeStep
           {...props}
-          customMessage="Ahora es momento de que el segundo cónyuge firme el convenio. Por favor entrega el dispositivo para continuar."
+          customMessage="Ahora es momento de que el segundo cónyuge realice sus firmas. Por favor entrega el dispositivo para continuar."
         />
       ),
       rol: null,
     },
     {
-      id: 'firma_conyuge2',
-      title: 'Ratificación del convenio - Segundo cónyuge',
-      description: 'Firma para ratificar el convenio de alimentos y convivencia',
+      id: 'firma_manifestacion_conyuge2',
+      title: 'Manifestación de voluntad de divorcio - Segundo cónyuge',
+      description: 'Por favor lee cuidadosamente la declaración y firma para continuar',
       component: (props: any) => {
+        const nombre1 = props.allData?.conyuge1_nombre || '_______'
+        const apellidoPaterno1 = props.allData?.conyuge1_apellido_paterno || '_______'
+        const apellidoMaterno1 = props.allData?.conyuge1_apellido_materno || '_______'
+        const nombreCompleto1 = `${nombre1} ${apellidoPaterno1} ${apellidoMaterno1}`
+
         const nombre2 = props.allData?.conyuge2_nombre || '_______'
+        const apellidoPaterno2 = props.allData?.conyuge2_apellido_paterno || '_______'
+        const apellidoMaterno2 = props.allData?.conyuge2_apellido_materno || '_______'
+        const nombreCompleto2 = `${nombre2} ${apellidoPaterno2} ${apellidoMaterno2}`
 
         return (
           <SignatureQuestion
             {...props}
-            manifestationTitle="Manifestación de Voluntad y Ratificación de Convenio"
-            manifestationText={`Yo, ${nombre2}, por mi propio derecho y bajo protesta de decir verdad, ratifico en todas y cada una de sus partes el convenio de alimentos y convivencias que fue generado a través del portal habilitado para tal efecto, reconociendo su contenido, alcances y efectos legales, y manifestando que el mismo fue aceptado de manera voluntaria, sin dolo, error, violencia o mala fe. Declaro conocer las consecuencias jurídicas del divorcio y del convenio que ratifico, firmando la presente de manera espontánea.`}
+            manifestationTitle="Manifestación de Voluntad de Divorcio"
+            manifestationText={`Yo, ${nombreCompleto2}, por mi propio derecho y bajo protesta de decir verdad, manifiesto que es mi voluntad libre, expresa y consciente disolver el vínculo matrimonial que me une con ${nombreCompleto1}, solicitando de manera voluntaria la tramitación del divorcio conforme a derecho, sin que exista dolo, error, violencia o mala fe en mi consentimiento. Asimismo, declaro que conozco los efectos legales del divorcio y que esta manifestación se realiza de manera voluntaria.`}
+          />
+        )
+      },
+      rol: null,
+    },
+    {
+      id: 'firma_ratificacion_conyuge2',
+      title: 'Ratificación del convenio - Segundo cónyuge',
+      description: 'Firma para ratificar el convenio de alimentos y convivencia',
+      component: (props: any) => {
+        const nombre2 = props.allData?.conyuge2_nombre || '_______'
+        const apellidoPaterno2 = props.allData?.conyuge2_apellido_paterno || '_______'
+        const apellidoMaterno2 = props.allData?.conyuge2_apellido_materno || '_______'
+        const nombreCompleto2 = `${nombre2} ${apellidoPaterno2} ${apellidoMaterno2}`
+
+        return (
+          <SignatureQuestion
+            {...props}
+            manifestationTitle="Ratificación de Convenio"
+            manifestationText={`Yo, ${nombreCompleto2}, por mi propio derecho y bajo protesta de decir verdad, ratifico en todas y cada una de sus partes el convenio de alimentos y convivencias que fue generado a través del portal habilitado para tal efecto, reconociendo su contenido, alcances y efectos legales, y manifestando que el mismo fue aceptado de manera voluntaria, sin dolo, error, violencia o mala fe. Declaro conocer las consecuencias jurídicas del divorcio y del convenio que ratifico, firmando la presente de manera voluntaria.`}
           />
         )
       },

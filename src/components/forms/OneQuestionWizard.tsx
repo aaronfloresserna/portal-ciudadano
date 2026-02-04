@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 
 interface Step {
   id: string
-  title: string
+  title: string | ((data: any) => string)
   description?: string
   component: React.ComponentType<StepComponentProps>
   shouldShow?: (data: any) => boolean
@@ -133,7 +133,9 @@ export function OneQuestionWizard({
         {/* Question Card */}
         <Card className="mb-6">
           <CardHeader>
-            <CardTitle className="text-black font-bold">{step.title}</CardTitle>
+            <CardTitle className="text-black font-bold">
+              {typeof step.title === 'function' ? step.title(data) : step.title}
+            </CardTitle>
             {step.description && (
               <CardDescription className="text-black">{step.description}</CardDescription>
             )}

@@ -41,12 +41,24 @@ export function TextQuestion({
 
     // Validar CURP (18 caracteres alfanuméricos en mayúsculas)
     if (validateCURP) {
-      const curpRegex = /^[A-Z0-9]*$/
       const upperValue = newValue.toUpperCase()
+
+      // No permitir más de 18 caracteres
+      if (upperValue.length > 18) {
+        return
+      }
+
+      const curpRegex = /^[A-Z0-9]*$/
       if (newValue && !curpRegex.test(upperValue)) {
         setValidationError('CURP solo debe contener letras mayúsculas y números')
         return
       }
+
+      // Mostrar error si tiene menos de 18 caracteres al intentar avanzar
+      if (upperValue.length > 0 && upperValue.length < 18) {
+        setValidationError('El CURP debe tener exactamente 18 caracteres')
+      }
+
       onChange(upperValue)
       return
     }
@@ -58,6 +70,10 @@ export function TextQuestion({
     if (e.key === 'Enter' && value && !validationError) {
       if (minLength && value.length < minLength) {
         setValidationError(`Debe tener al menos ${minLength} caracteres`)
+        return
+      }
+      if (validateCURP && value.length !== 18) {
+        setValidationError('El CURP debe tener exactamente 18 caracteres')
         return
       }
       onNext()

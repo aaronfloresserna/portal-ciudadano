@@ -9,6 +9,7 @@ export function PensionQuestion({ value, onChange, onNext, error, allData }: Ste
   const [responsable, setResponsable] = useState<string>('')
   const [porcentajePadre, setPorcentajePadre] = useState<number>(50)
   const [porcentajeMadre, setPorcentajeMadre] = useState<number>(50)
+  const [metodoActualizacion, setMetodoActualizacion] = useState<string>('')
 
   // Initialize from value
   useEffect(() => {
@@ -17,31 +18,38 @@ export function PensionQuestion({ value, onChange, onNext, error, allData }: Ste
       setResponsable(value.responsable || '')
       setPorcentajePadre(value.porcentajePadre || 50)
       setPorcentajeMadre(value.porcentajeMadre || 50)
+      setMetodoActualizacion(value.metodoActualizacion || '')
     }
   }, [])
 
   const handleMontoChange = (newMonto: number) => {
     setMonto(newMonto)
-    updateValue(newMonto, responsable, porcentajePadre, porcentajeMadre)
+    updateValue(newMonto, responsable, porcentajePadre, porcentajeMadre, metodoActualizacion)
   }
 
   const handleResponsableChange = (newResponsable: string) => {
     setResponsable(newResponsable)
-    updateValue(monto, newResponsable, porcentajePadre, porcentajeMadre)
+    updateValue(monto, newResponsable, porcentajePadre, porcentajeMadre, metodoActualizacion)
   }
 
   const handlePorcentajeChange = (padre: number, madre: number) => {
     setPorcentajePadre(padre)
     setPorcentajeMadre(madre)
-    updateValue(monto, responsable, padre, madre)
+    updateValue(monto, responsable, padre, madre, metodoActualizacion)
   }
 
-  const updateValue = (m: number, r: string, pPadre: number, pMadre: number) => {
+  const handleMetodoActualizacionChange = (newMetodo: string) => {
+    setMetodoActualizacion(newMetodo)
+    updateValue(monto, responsable, porcentajePadre, porcentajeMadre, newMetodo)
+  }
+
+  const updateValue = (m: number, r: string, pPadre: number, pMadre: number, metodo: string) => {
     onChange({
       monto: m,
       responsable: r,
       porcentajePadre: r === 'Compartida' ? pPadre : undefined,
       porcentajeMadre: r === 'Compartida' ? pMadre : undefined,
+      metodoActualizacion: metodo,
     })
   }
 
@@ -70,6 +78,70 @@ export function PensionQuestion({ value, onChange, onNext, error, allData }: Ste
             className="text-lg py-6 pl-8"
             placeholder="0.00"
           />
+        </div>
+      </div>
+
+      {/* Método de actualización de la pensión */}
+      <div>
+        <label className="block text-base font-semibold text-black mb-2">
+          ¿Cómo se actualizará el monto de la pensión?
+        </label>
+        <p className="text-sm text-gray-600 mb-3">
+          Selecciona el índice que se utilizará para ajustar el monto de la pensión anualmente
+        </p>
+        <div className="space-y-3">
+          {[
+            {
+              value: 'indice_precios_consumidor',
+              label: 'Índice de precios al consumidor',
+              description: 'La pensión se ajustará según el Índice Nacional de Precios al Consumidor (INPC)',
+            },
+            {
+              value: 'salario_minimo',
+              label: 'Salarios mínimos',
+              description: 'La pensión se ajustará en función del incremento al salario mínimo general',
+            },
+            {
+              value: 'inflacion',
+              label: 'Inflación',
+              description: 'La pensión se ajustará según la tasa de inflación anual',
+            },
+          ].map((opcion) => {
+            const isSelected = metodoActualizacion === opcion.value
+
+            return (
+              <button
+                key={opcion.value}
+                type="button"
+                onClick={() => handleMetodoActualizacionChange(opcion.value)}
+                className={`w-full text-left px-5 py-4 rounded-lg border-2 transition-all ${
+                  isSelected
+                    ? 'border-tsj-title bg-tsj-primary'
+                    : 'border-gray-200 bg-white hover:border-tsj-secondary'
+                }`}
+              >
+                <div className="flex items-start gap-3">
+                  <div
+                    className={`w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 mt-0.5 ${
+                      isSelected ? 'border-tsj-title' : 'border-gray-300'
+                    }`}
+                  >
+                    {isSelected && (
+                      <div className="w-3 h-3 rounded-full bg-tsj-title" />
+                    )}
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-base font-semibold text-black mb-1">
+                      {opcion.label}
+                    </p>
+                    <p className="text-sm text-gray-600">
+                      {opcion.description}
+                    </p>
+                  </div>
+                </div>
+              </button>
+            )
+          })}
         </div>
       </div>
 
