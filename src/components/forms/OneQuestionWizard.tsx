@@ -74,11 +74,21 @@ export function OneQuestionWizard({
 
   const handleNext = async () => {
     setError(undefined)
+
+    const currentData = dataRef.current
+    const currentStepData = currentData[step.id]
+
+    // Validación especial para CURP - debe tener exactamente 18 caracteres
+    if (step.id.includes('curp') && currentStepData) {
+      if (typeof currentStepData === 'string' && currentStepData.length !== 18) {
+        setError('El CURP debe tener exactamente 18 caracteres')
+        return
+      }
+    }
+
     setIsSaving(true)
 
     try {
-      const currentData = dataRef.current
-
       // Guardar progreso
       if (onSave) {
         await onSave(currentStep + 1, currentData)

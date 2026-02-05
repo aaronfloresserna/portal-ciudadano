@@ -89,9 +89,15 @@ export default function DivorcioTramitePage() {
         }),
       })
 
-      // Redirigir según rol
+      // Redirigir según rol y modalidad
       if (miRol === 'SOLICITANTE') {
-        router.push(`/tramites/divorcio/${tramiteId}/invitar`)
+        // Si eligieron "separado", mostrar página de invitación
+        // Si eligieron "juntos", ir directo a confirmación (ya tienen todos los datos)
+        if (data.modalidad_tramite === 'separado') {
+          router.push(`/tramites/divorcio/${tramiteId}/invitar`)
+        } else {
+          router.push(`/tramites/divorcio/${tramiteId}/confirmacion`)
+        }
       } else {
         router.push(`/tramites/divorcio/${tramiteId}/confirmacion`)
       }
@@ -151,11 +157,18 @@ export default function DivorcioTramitePage() {
       rol: 'SOLICITANTE',
     },
     {
-      id: 'conyuge1_apellidos',
-      title: '¿Cuáles son los apellidos del primer cónyuge?',
-      description: 'Apellido paterno y materno',
+      id: 'conyuge1_apellido_paterno',
+      title: '¿Cuál es el apellido paterno del primer cónyuge?',
       component: (props: any) => (
-        <TextQuestion {...props} maxLength={100} validateName />
+        <TextQuestion {...props} maxLength={50} validateName />
+      ),
+      rol: 'SOLICITANTE',
+    },
+    {
+      id: 'conyuge1_apellido_materno',
+      title: '¿Cuál es el apellido materno del primer cónyuge?',
+      component: (props: any) => (
+        <TextQuestion {...props} maxLength={50} validateName />
       ),
       rol: 'SOLICITANTE',
     },
@@ -522,6 +535,106 @@ export default function DivorcioTramitePage() {
       rol: null,
     },
 
+    // DATOS DEL SEGUNDO CÓNYUGE (solo cuando modalidad === 'juntos')
+    {
+      id: 'aviso_datos_conyuge2',
+      title: 'Datos del segundo cónyuge',
+      description: 'A continuación necesitamos los datos personales del segundo cónyuge',
+      component: (props: any) => (
+        <WelcomeStep
+          {...props}
+          customMessage="Ahora necesitamos los datos personales del segundo cónyuge. Por favor proporciona la siguiente información."
+        />
+      ),
+      shouldShow: (data: any) => data.modalidad_tramite === 'juntos',
+      rol: null,
+    },
+    {
+      id: 'conyuge2_nombre',
+      title: '¿Cuál es el nombre del segundo cónyuge?',
+      description: 'Solo el nombre o nombres (sin apellidos)',
+      component: (props: any) => (
+        <TextQuestion {...props} maxLength={100} validateName />
+      ),
+      shouldShow: (data: any) => data.modalidad_tramite === 'juntos',
+      rol: null,
+    },
+    {
+      id: 'conyuge2_apellido_paterno',
+      title: '¿Cuál es el apellido paterno del segundo cónyuge?',
+      component: (props: any) => (
+        <TextQuestion {...props} maxLength={50} validateName />
+      ),
+      shouldShow: (data: any) => data.modalidad_tramite === 'juntos',
+      rol: null,
+    },
+    {
+      id: 'conyuge2_apellido_materno',
+      title: '¿Cuál es el apellido materno del segundo cónyuge?',
+      component: (props: any) => (
+        <TextQuestion {...props} maxLength={50} validateName />
+      ),
+      shouldShow: (data: any) => data.modalidad_tramite === 'juntos',
+      rol: null,
+    },
+    {
+      id: 'conyuge2_curp',
+      title: 'CURP del segundo cónyuge',
+      description: '18 caracteres que aparecen en la identificación oficial',
+      component: (props: any) => (
+        <TextQuestion {...props} maxLength={18} minLength={18} validateCURP />
+      ),
+      shouldShow: (data: any) => data.modalidad_tramite === 'juntos',
+      rol: null,
+    },
+    {
+      id: 'conyuge2_fechaNacimiento',
+      title: 'Fecha de nacimiento del segundo cónyuge',
+      component: DateQuestion,
+      shouldShow: (data: any) => data.modalidad_tramite === 'juntos',
+      rol: null,
+    },
+    {
+      id: 'conyuge2_ine_frontal',
+      title: 'Sube la parte frontal de la INE del segundo cónyuge',
+      description: 'Foto o escaneo de la parte frontal de la identificación oficial (INE o IFE)',
+      component: (props: any) => (
+        <FileUploadQuestion
+          {...props}
+          tramiteId={tramiteId}
+          tipoDocumento="INE_CONYUGE_2_FRONTAL"
+          acceptedTypes="image/*"
+        />
+      ),
+      shouldShow: (data: any) => data.modalidad_tramite === 'juntos',
+      rol: null,
+    },
+    {
+      id: 'conyuge2_ine_trasera',
+      title: 'Sube la parte trasera de la INE del segundo cónyuge',
+      description: 'Foto o escaneo de la parte trasera de la identificación oficial (INE o IFE)',
+      component: (props: any) => (
+        <FileUploadQuestion
+          {...props}
+          tramiteId={tramiteId}
+          tipoDocumento="INE_CONYUGE_2_TRASERA"
+          acceptedTypes="image/*"
+        />
+      ),
+      shouldShow: (data: any) => data.modalidad_tramite === 'juntos',
+      rol: null,
+    },
+    {
+      id: 'conyuge2_correo',
+      title: 'Correo electrónico del segundo cónyuge',
+      description: 'Correo electrónico válido para recibir notificaciones del trámite',
+      component: (props: any) => (
+        <TextQuestion {...props} type="email" maxLength={100} />
+      ),
+      shouldShow: (data: any) => data.modalidad_tramite === 'juntos',
+      rol: null,
+    },
+
     // FIRMAS FINALES - Primer cónyuge (manifestación + ratificación consecutivas)
     {
       id: 'firma_manifestacion_conyuge1',
@@ -578,6 +691,7 @@ export default function DivorcioTramitePage() {
           customMessage="Ahora es momento de que el segundo cónyuge realice sus firmas. Por favor entrega el dispositivo para continuar."
         />
       ),
+      shouldShow: (data: any) => data.modalidad_tramite === 'juntos',
       rol: null,
     },
     {
@@ -603,6 +717,7 @@ export default function DivorcioTramitePage() {
           />
         )
       },
+      shouldShow: (data: any) => data.modalidad_tramite === 'juntos',
       rol: null,
     },
     {
@@ -623,6 +738,7 @@ export default function DivorcioTramitePage() {
           />
         )
       },
+      shouldShow: (data: any) => data.modalidad_tramite === 'juntos',
       rol: null,
     },
   ]
