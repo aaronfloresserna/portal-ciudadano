@@ -125,13 +125,17 @@ export async function PATCH(
     // Validar permisos según rol y estado del trámite
     if (datos && tramiteExistente.estado !== 'EN_PROGRESO') {
       const datosKeys = Object.keys(datos)
+      const datosExistentes = (tramiteExistente.datos as any) || {}
+      const datosActualizadosTemp = { ...datosExistentes, ...datos }
 
-      // Si es SOLICITANTE, no puede editar campos de conyuge2
+      // Si es SOLICITANTE, no puede editar campos de conyuge2 EXCEPTO si modalidad === 'juntos'
       if (participante.rol === 'SOLICITANTE') {
         const camposProhibidos = datosKeys.filter((key) =>
           key.startsWith('conyuge2_')
         )
-        if (camposProhibidos.length > 0) {
+        // Permitir edición si modalidad_tramite === 'juntos'
+        const modalidad = datosActualizadosTemp.modalidad_tramite
+        if (camposProhibidos.length > 0 && modalidad !== 'juntos') {
           return NextResponse.json(
             { error: 'No tienes permiso para editar los datos del otro cónyuge' },
             { status: 403 }

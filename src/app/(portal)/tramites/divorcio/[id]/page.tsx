@@ -659,6 +659,11 @@ export default function DivorcioTramitePage() {
           />
         )
       },
+      shouldShow: (data: any) => {
+        // Solo mostrar cuando los datos del segundo cónyuge estén disponibles
+        // Esto aplica para: modalidad 'juntos' O cuando el segundo cónyuge ya completó sus datos en modalidad 'separado'
+        return data.modalidad_tramite === 'juntos' || (data.conyuge2_nombre && data.conyuge2_apellido_paterno)
+      },
       rol: null,
     },
     {
@@ -678,6 +683,10 @@ export default function DivorcioTramitePage() {
             manifestationText={`Yo, ${nombreCompleto1}, por mi propio derecho y bajo protesta de decir verdad, ratifico en todas y cada una de sus partes el convenio de alimentos y convivencias que fue generado a través del portal habilitado para tal efecto, reconociendo su contenido, alcances y efectos legales, y manifestando que el mismo fue aceptado de manera voluntaria, sin dolo, error, violencia o mala fe. Declaro conocer las consecuencias jurídicas del divorcio y del convenio que ratifico, firmando la presente de manera voluntaria.`}
           />
         )
+      },
+      shouldShow: (data: any) => {
+        // Solo mostrar cuando los datos del segundo cónyuge estén disponibles
+        return data.modalidad_tramite === 'juntos' || (data.conyuge2_nombre && data.conyuge2_apellido_paterno)
       },
       rol: null,
     },
