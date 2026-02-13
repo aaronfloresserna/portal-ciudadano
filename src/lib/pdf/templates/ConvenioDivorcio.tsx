@@ -368,11 +368,13 @@ export function ConvenioDivorcio({ datos }: ConvenioDivorcioProps) {
         <View style={styles.section}>
           <Text style={styles.indent}>
             <Text style={styles.bold}>JURISPRUDENCIA APLICABLE:{'\n\n'}</Text>
-            Es aplicable la tesis aislada de la Primera Sala de la Suprema Corte de Justicia
-            de la Nación, publicada en el Semanario Judicial de la Federación, que establece:{'\n\n'}
-            <Text style={styles.bold}>"DIVORCIO SIN EXPRESIÓN DE CAUSA. EL ARTÍCULO 266 DEL CÓDIGO CIVIL
-            PARA EL ESTADO DE CHIHUAHUA, QUE LO ESTABLECE, NO VIOLA EL DERECHO HUMANO AL LIBRE DESARROLLO
-            DE LA PERSONALIDAD."</Text>{'\n\n'}
+            Es aplicable la jurisprudencia de la Primera Sala de la Suprema Corte de Justicia
+            de la Nación, con registro digital 2021695, Tesis 1a./J. 1/2020 (10a.), publicada en la
+            Gaceta del Semanario Judicial de la Federación, Libro 75, Febrero de 2020, Tomo I,
+            página 597, que establece:{'\n\n'}
+            <Text style={styles.bold}>"DIVORCIO SIN EXPRESIÓN DE CAUSA. EN CONTRA DE LA RESOLUCIÓN QUE LO DECRETA,
+            AUN SIN RESOLVER LA TOTALIDAD DE LAS CUESTIONES INHERENTES AL MATRIMONIO, PROCEDE EL JUICIO
+            DE AMPARO DIRECTO (LEGISLACIONES DE LA CIUDAD DE MÉXICO, COAHUILA Y AGUASCALIENTES)."</Text>{'\n\n'}
             Lo anterior en virtud de que el divorcio sin expresión de causa es una institución que
             protege el derecho humano al libre desarrollo de la personalidad, permitiendo a las personas
             disolver el vínculo matrimonial sin necesidad de acreditar causal alguna.
