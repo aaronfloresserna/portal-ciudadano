@@ -51,8 +51,8 @@ export function GastosQuestion({ value, onChange, tipo, onNext, error, allData }
   }
 
   const options = [
-    { value: 'Padre', label: 'El padre' },
-    { value: 'Madre', label: 'La madre' },
+    { value: 'Padre', label: 'El padre en su 100%' },
+    { value: 'Madre', label: 'La madre en su 100%' },
     { value: 'Compartida', label: 'Compartida (especificar porcentajes)' },
   ]
 

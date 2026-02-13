@@ -10,6 +10,7 @@ export function PensionQuestion({ value, onChange, onNext, error, allData }: Ste
   const [porcentajePadre, setPorcentajePadre] = useState<number>(50)
   const [porcentajeMadre, setPorcentajeMadre] = useState<number>(50)
   const [metodoActualizacion, setMetodoActualizacion] = useState<string>('')
+  const [cuentaBancaria, setCuentaBancaria] = useState<string>('')
 
   // Initialize from value
   useEffect(() => {
@@ -19,37 +20,44 @@ export function PensionQuestion({ value, onChange, onNext, error, allData }: Ste
       setPorcentajePadre(value.porcentajePadre || 50)
       setPorcentajeMadre(value.porcentajeMadre || 50)
       setMetodoActualizacion(value.metodoActualizacion || '')
+      setCuentaBancaria(value.cuentaBancaria || '')
     }
   }, [])
 
   const handleMontoChange = (newMonto: number) => {
     setMonto(newMonto)
-    updateValue(newMonto, responsable, porcentajePadre, porcentajeMadre, metodoActualizacion)
+    updateValue(newMonto, responsable, porcentajePadre, porcentajeMadre, metodoActualizacion, cuentaBancaria)
   }
 
   const handleResponsableChange = (newResponsable: string) => {
     setResponsable(newResponsable)
-    updateValue(monto, newResponsable, porcentajePadre, porcentajeMadre, metodoActualizacion)
+    updateValue(monto, newResponsable, porcentajePadre, porcentajeMadre, metodoActualizacion, cuentaBancaria)
   }
 
   const handlePorcentajeChange = (padre: number, madre: number) => {
     setPorcentajePadre(padre)
     setPorcentajeMadre(madre)
-    updateValue(monto, responsable, padre, madre, metodoActualizacion)
+    updateValue(monto, responsable, padre, madre, metodoActualizacion, cuentaBancaria)
   }
 
   const handleMetodoActualizacionChange = (newMetodo: string) => {
     setMetodoActualizacion(newMetodo)
-    updateValue(monto, responsable, porcentajePadre, porcentajeMadre, newMetodo)
+    updateValue(monto, responsable, porcentajePadre, porcentajeMadre, newMetodo, cuentaBancaria)
   }
 
-  const updateValue = (m: number, r: string, pPadre: number, pMadre: number, metodo: string) => {
+  const handleCuentaBancariaChange = (newCuenta: string) => {
+    setCuentaBancaria(newCuenta)
+    updateValue(monto, responsable, porcentajePadre, porcentajeMadre, metodoActualizacion, newCuenta)
+  }
+
+  const updateValue = (m: number, r: string, pPadre: number, pMadre: number, metodo: string, cuenta: string) => {
     onChange({
       monto: m,
       responsable: r,
       porcentajePadre: r === 'Compartida' ? pPadre : undefined,
       porcentajeMadre: r === 'Compartida' ? pMadre : undefined,
       metodoActualizacion: metodo,
+      cuentaBancaria: cuenta,
     })
   }
 
@@ -238,6 +246,39 @@ export function PensionQuestion({ value, onChange, onNext, error, allData }: Ste
           </div>
         </div>
       )}
+
+      {/* Cuenta bancaria */}
+      <div>
+        <label className="block text-base font-semibold text-black mb-2">
+          Cuenta bancaria (CLABE) para depósito de la pensión
+        </label>
+        <p className="text-sm text-gray-600 mb-3">
+          Ingresa la CLABE interbancaria de 18 dígitos donde se depositará la pensión alimenticia
+        </p>
+        <Input
+          type="text"
+          value={cuentaBancaria}
+          onChange={(e) => {
+            const value = e.target.value.replace(/\D/g, '') // Solo números
+            if (value.length <= 18) {
+              handleCuentaBancariaChange(value)
+            }
+          }}
+          className="text-lg py-6"
+          placeholder="000000000000000000"
+          maxLength={18}
+        />
+        {cuentaBancaria && cuentaBancaria.length !== 18 && (
+          <p className="text-sm text-amber-600 mt-2">
+            La CLABE debe tener exactamente 18 dígitos (actualmente: {cuentaBancaria.length})
+          </p>
+        )}
+        {cuentaBancaria && cuentaBancaria.length === 18 && (
+          <p className="text-sm text-green-600 mt-2">
+            ✓ CLABE válida
+          </p>
+        )}
+      </div>
     </div>
   )
 }

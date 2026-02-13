@@ -1,4 +1,5 @@
 import { Document, Page, Text, View, StyleSheet, Image } from '@react-pdf/renderer'
+import { cantidadALetras } from '@/lib/numeroALetras'
 
 // Helper function to format convivencia_dias
 const formatConvivenciaDias = (dias: string | string[] | undefined): string => {
@@ -23,11 +24,18 @@ const formatConvivenciaDias = (dias: string | string[] | undefined): string => {
 // Helper function to format gastos (medicos/escolares)
 const formatGastos = (gastos: string | { tipo: string; porcentajePadre?: number; porcentajeMadre?: number } | undefined): string => {
   if (!gastos) return 'Se dividirán conforme a lo acordado por las partes.'
-  if (typeof gastos === 'string') return gastos
+  if (typeof gastos === 'string') {
+    if (gastos === 'Padre') return 'El padre en su 100%'
+    if (gastos === 'Madre') return 'La madre en su 100%'
+    return gastos
+  }
 
   if (gastos.tipo === 'Compartida' && gastos.porcentajePadre && gastos.porcentajeMadre) {
     return `Compartida: ${gastos.porcentajePadre}% el padre, ${gastos.porcentajeMadre}% la madre`
   }
+
+  if (gastos.tipo === 'Padre') return 'El padre en su 100%'
+  if (gastos.tipo === 'Madre') return 'La madre en su 100%'
 
   return gastos.tipo
 }
@@ -127,9 +135,11 @@ interface ConvenioDivorcioProps {
   datos: {
     // Cónyuges
     conyuge1_nombre: string
-    conyuge1_apellidos: string
+    conyuge1_apellido_paterno: string
+    conyuge1_apellido_materno: string
     conyuge2_nombre: string
-    conyuge2_apellidos: string
+    conyuge2_apellido_paterno: string
+    conyuge2_apellido_materno: string
 
     // Matrimonio
     matrimonio_fecha: string
@@ -158,6 +168,8 @@ interface ConvenioDivorcioProps {
       responsable: string
       porcentajePadre?: number
       porcentajeMadre?: number
+      metodoActualizacion?: string
+      cuentaBancaria?: string
     }
     // Legacy fields (old format)
     pension_monto?: number
@@ -184,8 +196,8 @@ interface ConvenioDivorcioProps {
 }
 
 export function ConvenioDivorcio({ datos }: ConvenioDivorcioProps) {
-  const conyuge1 = `${datos.conyuge1_nombre || ''} ${datos.conyuge1_apellidos || ''}`.trim().toUpperCase() || 'CÓNYUGE 1'
-  const conyuge2 = `${datos.conyuge2_nombre || ''} ${datos.conyuge2_apellidos || ''}`.trim().toUpperCase() || 'CÓNYUGE 2'
+  const conyuge1 = `${datos.conyuge1_nombre || ''} ${datos.conyuge1_apellido_paterno || ''} ${datos.conyuge1_apellido_materno || ''}`.trim().toUpperCase() || 'CÓNYUGE 1'
+  const conyuge2 = `${datos.conyuge2_nombre || ''} ${datos.conyuge2_apellido_paterno || ''} ${datos.conyuge2_apellido_materno || ''}`.trim().toUpperCase() || 'CÓNYUGE 2'
 
   const domicilio = datos.domicilio
     ? `${datos.domicilio.calle} número ${datos.domicilio.numero || 'S/N'} de la colonia ${datos.domicilio.colonia || ''}`.trim()
@@ -291,11 +303,26 @@ export function ConvenioDivorcio({ datos }: ConvenioDivorcioProps) {
 
               {(() => {
                 const pension = formatPension(datos.pension_alimenticia, datos.pension_monto, datos.pension_responsable)
+                const cuentaBancaria = datos.pension_alimenticia?.cuentaBancaria || 'que se designe'
+                const metodoActualizacion = datos.pension_alimenticia?.metodoActualizacion
+                const metodoTexto = metodoActualizacion === 'indice_precios_consumidor'
+                  ? 'conforme al Índice Nacional de Precios al Consumidor (INPC)'
+                  : metodoActualizacion === 'salario_minimo'
+                  ? 'conforme al incremento del salario mínimo general'
+                  : metodoActualizacion === 'inflacion'
+                  ? 'conforme a la tasa de inflación anual'
+                  : 'conforme a lo que las partes acuerden'
+
+                // Convertir cantidad a letras
+                const montoNumerico = datos.pension_alimenticia?.monto || datos.pension_monto || 0
+                const montoEnLetras = montoNumerico > 0 ? cantidadALetras(montoNumerico) : ''
+
                 return (
                   <>
                     <Text style={styles.bold}>e) PENSIÓN ALIMENTICIA:</Text> {pension.responsable} se obliga a proporcionar
-                    una pensión alimenticia mensual por la cantidad de {pension.monto}, que será depositada
-                    en la cuenta bancaria que se designe, durante los primeros cinco días de cada mes.
+                    una pensión alimenticia mensual por la cantidad de {pension.monto}{montoEnLetras && ` (${montoEnLetras})`}, que será depositada
+                    en la cuenta bancaria {cuentaBancaria !== 'que se designe' ? `CLABE ${cuentaBancaria}` : cuentaBancaria}, durante los primeros cinco días de cada mes.
+                    {metodoActualizacion && ` La pensión se actualizará ${metodoTexto}.`}
                   </>
                 )
               })()}
