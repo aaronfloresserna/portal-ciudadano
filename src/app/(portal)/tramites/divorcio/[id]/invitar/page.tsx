@@ -316,7 +316,6 @@ export default function InvitarPage() {
                         id="email"
                         value={emailInvitado}
                         onChange={(e) => setEmailInvitado(e.target.value)}
-                        required
                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-tsj-primary focus:border-transparent"
                         placeholder="ejemplo@correo.com"
                       />

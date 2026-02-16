@@ -130,6 +130,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({
       success: true,
+      token: token_invitacion, // Token para generar el link
       invitacion: {
         id: invitacion.id,
         emailInvitado: invitacion.emailInvitado,
