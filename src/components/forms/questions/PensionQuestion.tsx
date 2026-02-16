@@ -85,6 +85,7 @@ export function PensionQuestion({ value, onChange, onNext, error, allData }: Ste
             onChange={(e) => handleMontoChange(parseFloat(e.target.value) || 0)}
             className="text-lg py-6 pl-8"
             placeholder="0.00"
+            required={false}
           />
         </div>
       </div>
@@ -267,6 +268,7 @@ export function PensionQuestion({ value, onChange, onNext, error, allData }: Ste
           className="text-lg py-6"
           placeholder="000000000000000000"
           maxLength={18}
+          required={false}
         />
         {cuentaBancaria && cuentaBancaria.length !== 18 && (
           <p className="text-sm text-amber-600 mt-2">

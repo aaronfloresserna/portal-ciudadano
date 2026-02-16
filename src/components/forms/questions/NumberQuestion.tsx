@@ -32,6 +32,7 @@ export function NumberQuestion({
         max={max}
         className="text-lg py-6"
         autoFocus
+        required={false}
       />
       {min !== undefined && max !== undefined && (
         <p className="text-sm text-black">

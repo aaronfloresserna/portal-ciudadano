@@ -111,6 +111,7 @@ export function FileUploadQuestion({
         onChange={handleFileSelect}
         accept={acceptedTypes}
         className="hidden"
+        required={false}
       />
 
       {error && (

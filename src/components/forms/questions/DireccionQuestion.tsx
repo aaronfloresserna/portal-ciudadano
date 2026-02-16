@@ -45,6 +45,7 @@ export function DireccionQuestion({ value, onChange }: StepComponentProps) {
           className="text-lg py-6"
           maxLength={200}
           placeholder="Ej: Av. Juárez"
+          required={false}
         />
       </div>
 
@@ -59,6 +60,7 @@ export function DireccionQuestion({ value, onChange }: StepComponentProps) {
           className="text-lg py-6"
           maxLength={20}
           placeholder="Ej: 123"
+          required={false}
         />
       </div>
 
@@ -73,6 +75,7 @@ export function DireccionQuestion({ value, onChange }: StepComponentProps) {
           className="text-lg py-6"
           maxLength={100}
           placeholder="Ej: Centro"
+          required={false}
         />
       </div>
     </div>
