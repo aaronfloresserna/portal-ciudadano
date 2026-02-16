@@ -19,7 +19,7 @@ export function FileUploadQuestion({
   tramiteId,
   tipoDocumento,
   acceptedTypes = 'image/*,.pdf',
-  maxSizeMB = 2,
+  maxSizeMB = 10,
   uploadUrl = '/api/documentos',
   headers = {},
 }: FileUploadQuestionProps) {

@@ -29,6 +29,24 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Validar tamaño del archivo (máximo 10MB)
+    const maxSize = 10 * 1024 * 1024 // 10MB
+    if (file.size > maxSize) {
+      return NextResponse.json(
+        { error: 'El archivo es demasiado grande. Máximo 10MB. Por favor comprime la imagen.' },
+        { status: 400 }
+      )
+    }
+
+    // Validar tipo de archivo
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'application/pdf']
+    if (!allowedTypes.includes(file.type)) {
+      return NextResponse.json(
+        { error: 'Tipo de archivo no permitido. Solo se permiten imágenes (JPG, PNG) y PDF' },
+        { status: 400 }
+      )
+    }
+
     // Verificar que el token de invitación sea válido para este trámite
     const invitacion = await prisma.invitacion.findFirst({
       where: {
