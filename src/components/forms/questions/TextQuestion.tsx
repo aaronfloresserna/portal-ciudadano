@@ -113,6 +113,8 @@ export function TextQuestion({
         maxLength={maxLength}
         className="text-lg py-6"
         autoFocus
+        pattern={undefined}
+        required={false}
       />
       {validationError && (
         <p className="text-sm text-red-600">{validationError}</p>

@@ -12,6 +12,8 @@ export function DateQuestion({ value, onChange }: StepComponentProps) {
         onChange={(e) => onChange(e.target.value)}
         className="text-lg py-6"
         autoFocus
+        pattern={undefined}
+        required={false}
       />
     </div>
   )
