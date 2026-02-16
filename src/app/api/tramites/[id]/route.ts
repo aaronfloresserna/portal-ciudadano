@@ -173,8 +173,16 @@ export async function PATCH(
     // Si se marca como datos completados
     if (marcarDatosCompletados) {
       if (participante.rol === 'SOLICITANTE') {
-        // actualizaciones.conyuge1Completado = true // COMENTADO TEMPORALMENTE
-        actualizaciones.estado = 'ESPERANDO_CONYUGE_2'
+        // Verificar modalidad del trámite
+        const modalidad = datosActualizados?.modalidad_tramite
+
+        if (modalidad === 'juntos') {
+          // Si están juntos, ambos datos ya están completos, ir directo a EN_PROGRESO
+          actualizaciones.estado = 'EN_PROGRESO'
+        } else {
+          // Si están separados, esperar al segundo cónyuge
+          actualizaciones.estado = 'ESPERANDO_CONYUGE_2'
+        }
 
         // Actualizar estado del participante
         await prisma.tramiteParticipante.update({
