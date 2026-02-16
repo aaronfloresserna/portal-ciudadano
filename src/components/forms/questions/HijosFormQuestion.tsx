@@ -216,7 +216,7 @@ export function HijosFormQuestion({ value, onChange, numeroHijos, tramiteId }: H
                       o arrastra el archivo aquí
                     </div>
                     <p className="text-xs text-gray-500">
-                      Imágenes (JPG, PNG) o PDF hasta 10MB
+                      Imágenes (JPG, PNG) o PDF hasta 4MB
                     </p>
                   </div>
                 </div>

@@ -58,11 +58,11 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Validar tamaño (máximo 10MB para Vercel serverless)
-    const maxSize = 10 * 1024 * 1024 // 10MB
+    // Validar tamaño (máximo 4MB para Vercel serverless - límite real 4.5MB)
+    const maxSize = 4 * 1024 * 1024 // 4MB
     if (file.size > maxSize) {
       return NextResponse.json(
-        { error: 'El archivo es demasiado grande. Máximo 10MB. Por favor comprime la imagen.' },
+        { error: 'El archivo es demasiado grande. Máximo 4MB. Por favor comprime la imagen antes de subirla.' },
         { status: 400 }
       )
     }
