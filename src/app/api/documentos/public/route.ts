@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
-import { writeFile } from 'fs/promises'
-import path from 'path'
-import { existsSync, mkdirSync } from 'fs'
+import crypto from 'crypto'
 
 // POST /api/documentos/public - Subir documento sin autenticación (usa token de invitación)
 export async function POST(request: NextRequest) {
@@ -66,33 +64,21 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Convertir archivo a base64 (compatible con Vercel serverless)
     const bytes = await file.arrayBuffer()
     const buffer = Buffer.from(bytes)
+    const base64 = buffer.toString('base64')
 
-    // Crear directorio si no existe
-    const uploadDir = process.env.UPLOAD_DIR || './public/uploads'
-    const tramiteDir = path.join(uploadDir, tramiteId)
+    // Generar un ID único para el archivo
+    const fileId = `${tipo}_${Date.now()}_${crypto.randomBytes(8).toString('hex')}`
 
-    if (!existsSync(tramiteDir)) {
-      mkdirSync(tramiteDir, { recursive: true })
-    }
-
-    // Generar nombre de archivo único
-    const timestamp = Date.now()
-    const extension = file.name.split('.').pop()
-    const filename = `${tipo}_${timestamp}.${extension}`
-    const filepath = path.join(tramiteDir, filename)
-
-    // Guardar archivo
-    await writeFile(filepath, buffer)
-
-    // Guardar registro en base de datos
+    // Guardar en la base de datos con el contenido en base64
     const documento = await prisma.documento.create({
       data: {
         tramiteId,
         tipo,
         nombreArchivo: file.name,
-        path: filepath,
+        path: `data:${file.type};base64,${base64}`,
         mimeType: file.type,
         size: file.size,
       },
