@@ -27,8 +27,21 @@ export default function DivorcioTramitePage() {
   const token = useAuthStore((state) => state.token)
   const [tramite, setTramite] = useState<any>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [hydrated, setHydrated] = useState(false)
+
+  // Esperar a que zustand rehydrate desde localStorage antes de verificar auth
+  useEffect(() => {
+    const store = useAuthStore as any
+    if (store.persist?.hasHydrated?.()) {
+      setHydrated(true)
+    } else {
+      const unsub = store.persist?.onFinishHydration?.(() => setHydrated(true))
+      return () => unsub?.()
+    }
+  }, [])
 
   useEffect(() => {
+    if (!hydrated) return
     if (!token) {
       router.push('/login')
       return
@@ -48,7 +61,7 @@ export default function DivorcioTramitePage() {
       })
       .catch((err) => console.error('Error al cargar trámite:', err))
       .finally(() => setIsLoading(false))
-  }, [tramiteId, token, router])
+  }, [hydrated, tramiteId, token, router])
 
   const handleSave = async (step: number, data: any) => {
     const response = await fetch(`/api/tramites/${tramiteId}`, {

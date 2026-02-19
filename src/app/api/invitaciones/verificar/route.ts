@@ -23,6 +23,7 @@ export async function GET(req: NextRequest) {
             id: true,
             tipo: true,
             estado: true,
+            datos: true,
           },
         },
         solicitante: {
@@ -99,6 +100,7 @@ export async function GET(req: NextRequest) {
           id: invitacion.tramite.id,
           tipo: invitacion.tramite.tipo,
           estado: invitacion.tramite.estado,
+          datos: invitacion.tramite.datos,
         },
       },
     });

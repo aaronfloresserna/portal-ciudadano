@@ -12,7 +12,6 @@ test.describe('Autenticación', () => {
     await page.fill('input[name="nombre"]', userName)
     await page.fill('input[name="email"]', userEmail)
     await page.fill('input[name="password"]', userPassword)
-    await page.fill('input[name="confirmPassword"]', userPassword)
 
     // Submit
     await page.click('button[type="submit"]')
@@ -25,19 +24,8 @@ test.describe('Autenticación', () => {
   })
 
   test('Puede iniciar sesión con usuario existente', async ({ page }) => {
-    // Primero registrar
-    await page.goto('/registro')
-    await page.fill('input[name="nombre"]', userName)
-    await page.fill('input[name="email"]', userEmail)
-    await page.fill('input[name="password"]', userPassword)
-    await page.fill('input[name="confirmPassword"]', userPassword)
-    await page.click('button[type="submit"]')
-    await expect(page).toHaveURL(/\/dashboard/)
-
-    // Cerrar sesión (si hay botón)
-    // await page.click('text=Cerrar sesión')
-
-    // Ir a login
+    // El usuario ya fue registrado en el test anterior (mismo userEmail)
+    // Ir directo a login
     await page.goto('/login')
     await page.fill('input[type="email"]', userEmail)
     await page.fill('input[type="password"]', userPassword)
@@ -54,8 +42,8 @@ test.describe('Autenticación', () => {
     await page.fill('input[type="password"]', 'WrongPassword123!')
     await page.click('button[type="submit"]')
 
-    // Debería mostrar un error
-    await expect(page.locator('text=/error|incorrecto|inválido/i')).toBeVisible({
+    // El API devuelve "Credenciales inválidas"
+    await expect(page.locator('text=/Credenciales inválidas/i')).toBeVisible({
       timeout: 5000,
     })
   })

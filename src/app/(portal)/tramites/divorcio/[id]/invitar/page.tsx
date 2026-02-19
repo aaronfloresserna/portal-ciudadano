@@ -11,12 +11,14 @@ export default function InvitarPage() {
   const { token } = useAuthStore()
 
   const [emailInvitado, setEmailInvitado] = useState('')
+  const [emailEnviado, setEmailEnviado] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [exito, setExito] = useState(false)
   const [tramite, setTramite] = useState<any>(null)
   const [linkInvitacion, setLinkInvitacion] = useState('')
   const [copiado, setCopiado] = useState(false)
+  const [hydrated, setHydrated] = useState(false)
 
   const copiarLink = () => {
     navigator.clipboard.writeText(linkInvitacion)
@@ -24,7 +26,19 @@ export default function InvitarPage() {
     setTimeout(() => setCopiado(false), 2000)
   }
 
+  // Esperar a que zustand rehydrate desde localStorage antes de verificar auth
   useEffect(() => {
+    const store = useAuthStore as any
+    if (store.persist?.hasHydrated?.()) {
+      setHydrated(true)
+    } else {
+      const unsub = store.persist?.onFinishHydration?.(() => setHydrated(true))
+      return () => unsub?.()
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!hydrated) return
     if (!token) {
       router.push('/login')
       return
@@ -57,7 +71,7 @@ export default function InvitarPage() {
     }
 
     cargarTramite()
-  }, [tramiteId, token, router])
+  }, [hydrated, tramiteId, token, router])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -88,6 +102,7 @@ export default function InvitarPage() {
       const link = `${appUrl}/conyuge2/${data.token}`
       setLinkInvitacion(link)
 
+      setEmailEnviado(emailInvitado)
       setExito(true)
       setEmailInvitado('')
     } catch (error: any) {
@@ -165,7 +180,7 @@ export default function InvitarPage() {
                     Invitación Generada
                   </h2>
                   <p className="text-gray-600 mb-4">
-                    Comparte el siguiente enlace con <strong>{emailInvitado}</strong> para que pueda completar sus datos personales.
+                    Comparte el siguiente enlace con <strong>{emailEnviado}</strong> para que pueda completar sus datos personales.
                   </p>
                 </div>
 
