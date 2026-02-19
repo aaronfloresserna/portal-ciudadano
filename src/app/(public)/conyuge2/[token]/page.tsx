@@ -113,7 +113,7 @@ export default function Conyuge2Page() {
       items: [
         { label: 'Fecha de matrimonio', value: tramiteData.matrimonio_fecha },
         { label: 'Estado donde se casaron', value: tramiteData.matrimonio_estado },
-        { label: 'Ciudad donde se casaron', value: tramiteData.matrimonio_estado },
+        { label: 'Ciudad donde se casaron', value: tramiteData.matrimonio_ciudad },
       ],
     })
 
@@ -140,8 +140,8 @@ export default function Conyuge2Page() {
         items: [
           { label: 'Responsable de gastos médicos', value: tramiteData.gastos_medicos },
           { label: 'Responsable de gastos escolares', value: tramiteData.gastos_escolares },
-          { label: 'Monto de pensión alimenticia', value: tramiteData.pension_alimenticia_monto },
-          { label: 'Responsable de pensión', value: tramiteData.pension_alimenticia_responsable },
+          { label: 'Monto de pensión alimenticia', value: tramiteData.pension_alimenticia?.monto },
+          { label: 'Responsable de pensión', value: tramiteData.pension_alimenticia?.responsable },
         ],
       })
     }
