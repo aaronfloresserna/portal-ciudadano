@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef } from 'react'
+import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 
@@ -38,6 +39,7 @@ export function OneQuestionWizard({
   onComplete,
   onSave,
 }: OneQuestionWizardProps) {
+  const router = useRouter()
   const [currentStep, setCurrentStep] = useState(() => Math.min(initialStep, steps.length - 1))
   const [data, setData] = useState<any>(initialData)
   const [error, setError] = useState<string>()
@@ -124,6 +126,18 @@ export function OneQuestionWizard({
     }
   }
 
+  const handleSaveAndExit = async () => {
+    setIsSaving(true)
+    try {
+      if (onSave) {
+        await onSave(currentStep, dataRef.current)
+      }
+    } finally {
+      setIsSaving(false)
+      router.push('/dashboard')
+    }
+  }
+
   return (
     <div className="min-h-screen bg-tsj-bg py-12">
       <div className="max-w-3xl mx-auto px-4">
@@ -181,18 +195,30 @@ export function OneQuestionWizard({
             ← Atrás
           </Button>
 
-          <Button
-            type="button"
-            onClick={handleNext}
-            disabled={(!data[step.id] && !step.optional) || isSaving}
-            className="px-8 py-6 text-base"
-          >
-            {isSaving
-              ? 'Guardando...'
-              : currentStep === steps.length - 1
-              ? 'Finalizar'
-              : 'Siguiente →'}
-          </Button>
+          <div className="flex gap-3">
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={handleSaveAndExit}
+              disabled={isSaving}
+              className="px-6 py-6 text-base text-gray-500 hover:text-gray-700"
+            >
+              Guardar y salir
+            </Button>
+
+            <Button
+              type="button"
+              onClick={handleNext}
+              disabled={(!data[step.id] && !step.optional) || isSaving}
+              className="px-8 py-6 text-base"
+            >
+              {isSaving
+                ? 'Guardando...'
+                : currentStep === steps.length - 1
+                ? 'Finalizar'
+                : 'Siguiente →'}
+            </Button>
+          </div>
         </div>
 
         {/* Help text */}
