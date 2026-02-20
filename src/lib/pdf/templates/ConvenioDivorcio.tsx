@@ -189,6 +189,8 @@ interface ConvenioDivorcioProps {
     // Firmas
     firma_conyuge1?: string
     firma_conyuge2?: string
+    firma_manifestacion_conyuge1?: string
+    firma_manifestacion_conyuge2?: string
 
     // Fechas
     fecha_presentacion?: string
