@@ -414,7 +414,7 @@ export function ConvenioDivorcio({ datos }: ConvenioDivorcioProps) {
         </View>
 
         {/* Firmas */}
-        <View style={styles.signatureSection}>
+        <View style={styles.signatureSection} wrap={false}>
           <View style={styles.signatureLine}>
             {(datos.firma_manifestacion_conyuge1 || datos.firma_conyuge1) && (
               <Image src={datos.firma_manifestacion_conyuge1 || datos.firma_conyuge1} style={styles.signatureImage} />
