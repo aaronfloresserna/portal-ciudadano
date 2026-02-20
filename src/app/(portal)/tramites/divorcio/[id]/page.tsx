@@ -739,7 +739,7 @@ export default function DivorcioTramitePage() {
           />
         )
       },
-      shouldShow: (data: any) => data.modalidad_tramite === 'juntos',
+      shouldShow: (data: any) => data.modalidad_tramite === 'juntos' || (data.conyuge2_nombre && data.conyuge2_apellido_paterno),
       rol: null,
     },
     {
@@ -760,7 +760,7 @@ export default function DivorcioTramitePage() {
           />
         )
       },
-      shouldShow: (data: any) => data.modalidad_tramite === 'juntos',
+      shouldShow: (data: any) => data.modalidad_tramite === 'juntos' || (data.conyuge2_nombre && data.conyuge2_apellido_paterno),
       rol: null,
     },
   ]
