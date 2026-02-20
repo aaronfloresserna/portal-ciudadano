@@ -42,10 +42,10 @@ export function Header() {
               Información Judicial
             </Link>
             <Link
-              href="/dashboard"
+              href="/mis-tramites"
               className="text-white hover:text-white/80 font-medium text-sm uppercase tracking-wide transition-colors"
             >
-              Auxiliares Judiciales
+              Mis Trámites
             </Link>
             <div className="bg-white/10 rounded-full">
               <NotificationBell />
