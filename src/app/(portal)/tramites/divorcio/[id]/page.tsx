@@ -789,11 +789,17 @@ export default function DivorcioTramitePage() {
     })
   }
 
+  // Reanudar en el paso guardado solo durante la fase de datos personales.
+  // En la fase de firma (EN_PROGRESO) siempre se empieza desde el inicio.
+  const esFaseDatos = tramite.miEstadoDatos === 'PENDIENTE'
+  const initialStep = esFaseDatos ? (tramite.pasoActual ?? 0) : 0
+
   return (
     <OneQuestionWizard
       steps={steps}
       tramiteId={tramiteId}
       initialData={tramite.datos || {}}
+      initialStep={initialStep}
       onSave={handleSave}
       onComplete={handleComplete}
     />

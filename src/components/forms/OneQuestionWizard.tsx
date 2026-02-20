@@ -25,6 +25,7 @@ interface OneQuestionWizardProps {
   steps: Step[]
   tramiteId: string
   initialData?: any
+  initialStep?: number
   onComplete: (data: any) => void
   onSave?: (step: number, data: any) => Promise<void>
 }
@@ -33,10 +34,11 @@ export function OneQuestionWizard({
   steps,
   tramiteId,
   initialData = {},
+  initialStep = 0,
   onComplete,
   onSave,
 }: OneQuestionWizardProps) {
-  const [currentStep, setCurrentStep] = useState(0)
+  const [currentStep, setCurrentStep] = useState(() => Math.min(initialStep, steps.length - 1))
   const [data, setData] = useState<any>(initialData)
   const [error, setError] = useState<string>()
   const [isSaving, setIsSaving] = useState(false)
