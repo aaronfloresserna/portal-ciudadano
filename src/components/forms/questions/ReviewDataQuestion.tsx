@@ -2,7 +2,6 @@
 
 import { useState } from 'react'
 import { StepComponentProps } from '../OneQuestionWizard'
-import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 
 interface DataSection {
@@ -30,16 +29,21 @@ export function ReviewDataQuestion({
   )
   const [showCommentFor, setShowCommentFor] = useState<string | null>(null)
 
+  const isAllReviewed = (status: Record<string, string>) =>
+    sections.every(
+      (section) => status[section.key] === 'accepted' || status[section.key] === 'rejected'
+    )
+
   const handleAccept = (sectionKey: string) => {
     const newStatus = { ...reviewStatus, [sectionKey]: 'accepted' as const }
     setReviewStatus(newStatus)
-    onChange(newStatus)
+    onChange(isAllReviewed(newStatus) ? newStatus : null)
   }
 
   const handleReject = (sectionKey: string) => {
     const newStatus = { ...reviewStatus, [sectionKey]: 'rejected' as const }
     setReviewStatus(newStatus)
-    onChange(newStatus)
+    onChange(isAllReviewed(newStatus) ? newStatus : null)
     setShowCommentFor(sectionKey)
   }
 
@@ -188,7 +192,7 @@ export function ReviewDataQuestion({
                   const newStatus = { ...reviewStatus }
                   delete newStatus[section.key]
                   setReviewStatus(newStatus)
-                  onChange(newStatus)
+                  onChange(null) // ya no está todo revisado
                 }}
                 className="mt-4 text-sm text-gray-600 hover:text-gray-800"
               >
@@ -199,15 +203,10 @@ export function ReviewDataQuestion({
         )
       })}
 
-      {allReviewed && (
-        <div className="flex justify-center pt-4">
-          <Button
-            onClick={onNext}
-            className="px-8 py-3 bg-tsj-primary text-white rounded-lg font-medium hover:bg-tsj-secondary"
-          >
-            Continuar con mis datos personales
-          </Button>
-        </div>
+      {!allReviewed && (
+        <p className="text-center text-sm text-gray-500 pt-2">
+          Acepta o rechaza todas las secciones para continuar.
+        </p>
       )}
     </div>
   )

@@ -226,7 +226,7 @@ export default function InvitarPage() {
                     <button
                       type="button"
                       onClick={copiarLink}
-                      className="px-6 py-3 bg-tsj-primary text-white rounded-lg font-medium hover:bg-tsj-secondary transition-colors flex items-center gap-2"
+                      className="px-6 py-3 bg-tsj-title text-white rounded-lg font-medium hover:bg-tsj-primary hover:text-tsj-title transition-colors flex items-center gap-2"
                     >
                       {copiado ? (
                         <>
@@ -276,7 +276,7 @@ export default function InvitarPage() {
                   <button
                     type="button"
                     onClick={() => router.push('/dashboard')}
-                    className="flex-1 bg-tsj-primary text-white px-6 py-3 rounded-lg font-medium hover:bg-tsj-secondary transition-colors"
+                    className="flex-1 bg-tsj-title text-white px-6 py-3 rounded-lg font-medium hover:bg-tsj-primary hover:text-tsj-title transition-colors"
                   >
                     Ir al Dashboard
                   </button>
@@ -374,7 +374,7 @@ export default function InvitarPage() {
                       <button
                         type="submit"
                         disabled={loading}
-                        className="flex-1 bg-tsj-primary text-white px-6 py-3 rounded-lg font-medium hover:bg-tsj-secondary transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="flex-1 bg-tsj-title text-white px-6 py-3 rounded-lg font-medium hover:bg-tsj-primary hover:text-tsj-title transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         {loading ? 'Enviando...' : 'Enviar Invitación'}
                       </button>
