@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useAuthStore } from '@/stores/authStore'
@@ -8,15 +8,35 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Header } from '@/components/layout/Header'
 
+const ESTADO_LABELS: Record<string, { label: string; color: string }> = {
+  BORRADOR: { label: 'En progreso', color: 'bg-yellow-100 text-yellow-800' },
+  ESPERANDO_CONYUGE_2: { label: 'Esperando al segundo cónyuge', color: 'bg-blue-100 text-blue-800' },
+  EN_PROGRESO: { label: 'Listo para firmar', color: 'bg-green-100 text-green-800' },
+  COMPLETADO: { label: 'Completado', color: 'bg-gray-100 text-gray-600' },
+}
+
 export default function DashboardPage() {
   const router = useRouter()
-  const { usuario, clearAuth } = useAuthStore()
+  const { usuario, token, clearAuth } = useAuthStore()
+  const [tramites, setTramites] = useState<any[]>([])
 
   useEffect(() => {
     if (!usuario) {
       router.push('/login')
     }
   }, [usuario, router])
+
+  useEffect(() => {
+    if (!token) return
+    fetch('/api/tramites', {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.tramites) setTramites(data.tramites)
+      })
+      .catch(() => {})
+  }, [token])
 
   const handleLogout = () => {
     clearAuth()
@@ -52,6 +72,44 @@ export default function DashboardPage() {
 
       {/* Main Content */}
       <main className="max-w-5xl mx-auto px-6 lg:px-8 py-16">
+
+        {/* Trámites en curso */}
+        {tramites.length > 0 && (
+          <div className="mb-14">
+            <h2 className="text-2xl font-bold text-tsj-title mb-6">Mis Trámites</h2>
+            <div className="space-y-4">
+              {tramites.map((t) => {
+                const estado = ESTADO_LABELS[t.estado] ?? { label: t.estado, color: 'bg-gray-100 text-gray-600' }
+                const href = t.tipo === 'DIVORCIO_VOLUNTARIO'
+                  ? `/tramites/divorcio/${t.id}`
+                  : `/tramites/${t.id}`
+                return (
+                  <div key={t.id} className="bg-white rounded-lg shadow-sm border border-gray-200 px-6 py-4 flex items-center justify-between gap-4">
+                    <div>
+                      <p className="font-semibold text-gray-900">
+                        {t.tipo === 'DIVORCIO_VOLUNTARIO' ? 'Divorcio Voluntario' : t.tipo}
+                      </p>
+                      <p className="text-sm text-gray-500 mt-0.5">
+                        Creado el {new Date(t.createdAt).toLocaleDateString('es-MX', { day: 'numeric', month: 'long', year: 'numeric' })}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <span className={`px-3 py-1 rounded-full text-xs font-medium ${estado.color}`}>
+                        {estado.label}
+                      </span>
+                      {t.estado !== 'COMPLETADO' && (
+                        <Link href={href}>
+                          <Button>Continuar</Button>
+                        </Link>
+                      )}
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+        )}
+
         <div className="mb-12 text-center">
           <h2 className="text-4xl font-bold text-tsj-title mb-3">
             Trámites Disponibles
