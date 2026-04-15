@@ -1,12 +1,14 @@
 import { PrismaClient } from '@prisma/client'
 import { PrismaPg } from '@prisma/adapter-pg'
-import pg from 'pg'
+import { Pool, neonConfig } from '@neondatabase/serverless'
+import ws from 'ws'
+
+// Use WebSocket for serverless environments (faster cold starts)
+neonConfig.webSocketConstructor = ws
 
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined
 }
-
-const { Pool } = pg
 
 const connectionString = process.env.DATABASE_URL!
 
@@ -21,4 +23,3 @@ export const prisma =
   })
 
 if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma
-// Force serverless invalidation Tue Jan 27 14:59:09 CST 2026
