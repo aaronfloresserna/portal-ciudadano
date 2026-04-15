@@ -83,7 +83,7 @@ export async function POST(request: NextRequest) {
         data: {
           tipo,
           estado: 'BORRADOR',
-          pasoActual: 1,
+          pasoActual: 0,
           datos: {},
         },
       })
