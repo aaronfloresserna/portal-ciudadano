@@ -3,100 +3,47 @@ import { prisma } from '@/lib/db'
 import { getUserIdFromRequest } from '@/lib/auth'
 import crypto from 'crypto'
 
-// POST /api/documentos - Subir un documento
 export async function POST(request: NextRequest) {
   try {
     const userId = getUserIdFromRequest(request)
-
     if (!userId) {
-      return NextResponse.json(
-        { error: 'No autorizado' },
-        { status: 401 }
-      )
+      return NextResponse.json({ error: 'No autorizado' }, { status: 401 })
     }
 
-    const formData = await request.formData()
-    const file = formData.get('file') as File
-    const tramiteId = formData.get('tramiteId') as string
-    const tipo = formData.get('tipo') as string
+    const body = await request.json()
+    const { key, tramiteId, tipo, mimeType, size, nombreArchivo } = body
 
-    if (!file) {
-      return NextResponse.json(
-        { error: 'No se proporcionó ningún archivo' },
-        { status: 400 }
-      )
+    if (!key || !tramiteId || !tipo || !mimeType || !size || !nombreArchivo) {
+      return NextResponse.json({ error: 'Faltan campos requeridos' }, { status: 400 })
     }
 
-    if (!tramiteId || !tipo) {
-      return NextResponse.json(
-        { error: 'tramiteId y tipo son requeridos' },
-        { status: 400 }
-      )
+    // Validate key belongs to this tramite (prevent cross-tramite spoofing)
+    if (!key.startsWith(`tramites/${tramiteId}/`)) {
+      return NextResponse.json({ error: 'Key inválido' }, { status: 400 })
     }
 
-    // Verificar que el usuario es participante del trámite
     const participante = await prisma.tramiteParticipante.findFirst({
-      where: {
-        tramiteId,
-        usuarioId: userId,
-      },
+      where: { tramiteId, usuarioId: userId },
     })
-
     if (!participante) {
-      return NextResponse.json(
-        { error: 'Trámite no encontrado o sin acceso' },
-        { status: 404 }
-      )
+      return NextResponse.json({ error: 'Trámite no encontrado o sin acceso' }, { status: 404 })
     }
 
-    // Validar tipo de archivo
-    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'application/pdf']
-    if (!allowedTypes.includes(file.type)) {
-      return NextResponse.json(
-        { error: 'Tipo de archivo no permitido. Solo se permiten imágenes (JPG, PNG) y PDF' },
-        { status: 400 }
-      )
-    }
-
-    // Validar tamaño (máximo 4MB para Vercel serverless - límite real 4.5MB)
-    const maxSize = 4 * 1024 * 1024 // 4MB
-    if (file.size > maxSize) {
-      return NextResponse.json(
-        { error: 'El archivo es demasiado grande. Máximo 4MB. Por favor comprime la imagen antes de subirla.' },
-        { status: 400 }
-      )
-    }
-
-    // Convertir archivo a base64 (para Vercel serverless)
-    const bytes = await file.arrayBuffer()
-    const buffer = Buffer.from(bytes)
-    const base64 = buffer.toString('base64')
-
-    // Generar un ID único para el archivo
-    const fileId = `${tipo}_${Date.now()}_${crypto.randomBytes(8).toString('hex')}`
-
-    // Guardar en la base de datos con el contenido en base64
     const documento = await prisma.documento.create({
       data: {
         tramiteId,
         tipo,
-        nombreArchivo: file.name,
-        path: `data:${file.type};base64,${base64}`, // Data URI para acceso directo
-        mimeType: file.type,
-        size: file.size,
+        nombreArchivo,
+        path: key,
+        mimeType,
+        size,
       },
     })
 
-    return NextResponse.json({
-      success: true,
-      documento,
-    }, { status: 201 })
+    return NextResponse.json({ success: true, documento }, { status: 201 })
   } catch (error) {
-    console.error('Error al subir documento:', error)
-    return NextResponse.json(
-      { error: 'Error al subir documento' },
-      { status: 500 }
-    )
+    console.error('Error al registrar documento:', error)
+    return NextResponse.json({ error: 'Error al registrar documento' }, { status: 500 })
   }
 }
 
