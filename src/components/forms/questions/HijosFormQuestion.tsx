@@ -87,34 +87,66 @@ export function HijosFormQuestion({ value, onChange, numeroHijos, tramiteId }: H
     setUploadError({ ...uploadError, [index]: '' })
 
     try {
-      const formData = new FormData()
-      formData.append('file', file)
-      formData.append('tramiteId', tramiteId)
-      formData.append('tipo', `ACTA_NACIMIENTO_HIJO_${index + 1}`)
-
       const token = localStorage.getItem('auth-storage')
-        ? JSON.parse(localStorage.getItem('auth-storage')!).state.token
+        ? JSON.parse(localStorage.getItem('auth-storage')!).state?.token
         : null
 
-      const response = await fetch('/api/documentos', {
+      const authHeaders: Record<string, string> = {
+        'Content-Type': 'application/json',
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      }
+
+      const tipo = `ACTA_NACIMIENTO_HIJO_${index + 1}`
+
+      // Step 1: Presign
+      const presignRes = await fetch('/api/documentos/presign', {
         method: 'POST',
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        body: formData,
+        headers: authHeaders,
+        body: JSON.stringify({
+          tramiteId,
+          tipo,
+          mimeType: file.type,
+          size: file.size,
+          nombreArchivo: file.name,
+        }),
       })
+      if (!presignRes.ok) {
+        const err = await presignRes.json()
+        throw new Error(err.error || 'Error al preparar la subida')
+      }
+      const { uploadUrl, key } = await presignRes.json()
 
-      const data = await response.json()
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Error al subir archivo')
+      // Step 2: PUT to S3
+      const s3Res = await fetch(uploadUrl, {
+        method: 'PUT',
+        headers: { 'Content-Type': file.type },
+        body: file,
+      })
+      if (!s3Res.ok) {
+        throw new Error(`Error al subir archivo (${s3Res.status})`)
       }
 
+      // Step 3: Register
+      const registerRes = await fetch('/api/documentos', {
+        method: 'POST',
+        headers: authHeaders,
+        body: JSON.stringify({
+          key,
+          tramiteId,
+          tipo,
+          mimeType: file.type,
+          size: file.size,
+          nombreArchivo: file.name,
+        }),
+      })
+      if (!registerRes.ok) {
+        const err = await registerRes.json()
+        throw new Error(err.error || 'Error al registrar documento')
+      }
+
+      const data = await registerRes.json()
       const nuevosHijos = [...hijos]
-      nuevosHijos[index] = {
-        ...nuevosHijos[index],
-        actaNacimiento: data.documento,
-      }
+      nuevosHijos[index] = { ...nuevosHijos[index], actaNacimiento: data.documento }
       setHijos(nuevosHijos)
       onChange(nuevosHijos)
     } catch (err: any) {
