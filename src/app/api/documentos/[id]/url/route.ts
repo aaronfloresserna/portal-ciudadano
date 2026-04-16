@@ -34,7 +34,7 @@ export async function GET(
     const hasAccess = userId
       ? documento.tramite.participantes.some((p) => p.usuarioId === userId)
       : documento.tramite.invitaciones.some(
-          (i) => i.token === invitacionToken && i.estado === 'PENDIENTE'
+          (i) => i.token === invitacionToken && i.estado === 'PENDIENTE' && i.expiraEn > new Date()
         )
 
     if (!hasAccess) {

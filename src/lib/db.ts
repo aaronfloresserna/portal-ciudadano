@@ -8,7 +8,7 @@ const globalForPrisma = globalThis as unknown as {
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: { rejectUnauthorized: false },
+  ssl: { rejectUnauthorized: false }, // TODO: pin AWS RDS CA bundle in production for full SSL verification
 })
 
 const adapter = new PrismaPg(pool)

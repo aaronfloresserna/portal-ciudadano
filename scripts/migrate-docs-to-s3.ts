@@ -58,6 +58,7 @@ async function main() {
       const [, mimeType, b64] = match
       const buffer = Buffer.from(b64, 'base64')
       const ext = MIME_TO_EXT[mimeType] ?? '.bin'
+      // Migration keys use doc.id for determinism (vs timestamp+random for new uploads)
       const key = `tramites/${doc.tramiteId}/${doc.tipo}_${doc.id}${ext}`
 
       if (isDryRun) {
