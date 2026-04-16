@@ -5,9 +5,10 @@ import { getPresignedGetUrl, isLegacyPath } from '@/lib/s3'
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     const userId = getUserIdFromRequest(request)
     const invitacionToken = request.headers.get('X-Invitacion-Token')
 
@@ -16,7 +17,7 @@ export async function GET(
     }
 
     const documento = await prisma.documento.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         tramite: {
           include: {
