@@ -2,12 +2,12 @@ import nodemailer from 'nodemailer';
 
 // Configuración del transportador de email
 const transporter = nodemailer.createTransport({
-  host: process.env.SES_SMTP_HOST,
-  port: 587,
-  secure: false,
+  host: process.env.SMTP_HOST,
+  port: parseInt(process.env.SMTP_PORT || '587'),
+  secure: false, // true para 465, false para otros puertos
   auth: {
-    user: process.env.SES_SMTP_USER,
-    pass: process.env.SES_SMTP_PASSWORD,
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASSWORD,
   },
 });
 
