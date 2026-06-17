@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Forky — un solo menú, siempre el correcto</title>
+<style>
+  :root{
+    --ink:#2a2520;
+    --soft:#6b6258;
+    --cream:#fbf7f1;
+    --card:#ffffff;
+    --line:#ece4d8;
+    --green:#3f8f6b;
+    --green-soft:#e7f3ec;
+    --amber:#e0903a;
+    --amber-soft:#fbeedd;
+    --shadow:0 18px 50px -22px rgba(63,52,38,.35);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,sans-serif;
+    color:var(--ink);
+    background:var(--cream);
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1080px;margin:0 auto;padding:0 24px}
+
+  /* nav */
+  nav{display:flex;align-items:center;justify-content:space-between;padding:26px 24px;max-width:1080px;margin:0 auto}
+  .logo{display:flex;align-items:center;gap:9px;font-weight:700;font-size:20px;letter-spacing:-.02em}
+  .logo .fork{font-size:22px}
+  .nav-cta{background:var(--ink);color:#fff;border:none;padding:11px 20px;border-radius:999px;font-size:15px;font-weight:600;cursor:pointer}
+
+  /* hero */
+  .hero{text-align:center;padding:48px 0 20px}
+  .pill{display:inline-block;background:#fff;border:1px solid var(--line);color:var(--soft);font-size:13.5px;padding:6px 14px;border-radius:999px;margin-bottom:22px}
+  h1{font-size:clamp(32px,5.4vw,54px);line-height:1.08;letter-spacing:-.03em;font-weight:800;max-width:14ch;margin:0 auto 18px}
+  h1 .hl{color:var(--green)}
+  .sub{font-size:clamp(17px,2.4vw,20px);color:var(--soft);max-width:46ch;margin:0 auto 28px}
+  .cta-row{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+  .btn-primary{background:var(--green);color:#fff;border:none;padding:14px 26px;border-radius:999px;font-size:16px;font-weight:600;cursor:pointer;box-shadow:0 12px 26px -12px var(--green)}
+  .btn-ghost{background:transparent;color:var(--ink);border:1px solid var(--line);padding:14px 24px;border-radius:999px;font-size:16px;font-weight:600;cursor:pointer}
+  .reassure{margin-top:14px;font-size:13.5px;color:var(--soft)}
+
+  /* phone mockup */
+  .stage{display:flex;justify-content:center;padding:44px 0 10px}
+  .phone{
+    width:340px;background:#fff;border-radius:38px;padding:14px;
+    box-shadow:var(--shadow);border:1px solid var(--line);
+  }
+  .screen{background:var(--cream);border-radius:26px;overflow:hidden}
+  .app-top{display:flex;align-items:center;justify-content:space-between;padding:18px 18px 12px}
+  .app-top .title{font-weight:700;font-size:17px}
+  .app-top .sub{font-size:12.5px;color:var(--soft);margin:0}
+  .avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#f0b35e,#e0903a);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:13px}
+
+  .live{margin:4px 18px 0;background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px 16px}
+  .live .row{display:flex;align-items:center;justify-content:space-between}
+  .badge-live{display:inline-flex;align-items:center;gap:6px;background:var(--green-soft);color:var(--green);font-size:12px;font-weight:600;padding:4px 10px;border-radius:999px}
+  .dot{width:7px;height:7px;border-radius:50%;background:var(--green);display:inline-block}
+  .live h3{font-size:15px;margin:10px 0 2px}
+  .live p{font-size:12.5px;color:var(--soft)}
+
+  .section-label{font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--soft);margin:18px 18px 8px}
+
+  .history{margin:0 18px}
+  .item{display:flex;gap:12px;padding:11px 0;border-bottom:1px solid var(--line)}
+  .item:last-child{border-bottom:none}
+  .ic{width:34px;height:34px;border-radius:10px;flex:none;display:flex;align-items:center;justify-content:center;font-size:16px;background:#fff;border:1px solid var(--line)}
+  .item .body{flex:1}
+  .item .what{font-size:13.5px;font-weight:600;line-height:1.3}
+  .item .who{font-size:12px;color:var(--soft)}
+  .undo{font-size:12.5px;font-weight:600;color:var(--green);background:var(--green-soft);border:none;padding:7px 12px;border-radius:999px;cursor:pointer;align-self:center;flex:none}
+
+  .pending{margin:4px 18px 0;background:var(--amber-soft);border:1px solid #f3dcbf;border-radius:16px;padding:14px 16px}
+  .pending .badge{display:inline-flex;align-items:center;gap:6px;color:var(--amber);font-weight:700;font-size:12px}
+  .pending h4{font-size:14px;margin:8px 0 2px}
+  .pending p{font-size:12.5px;color:var(--soft);margin-bottom:12px}
+  .pending .actions{display:flex;gap:8px}
+  .ok{flex:1;background:var(--green);color:#fff;border:none;padding:10px;border-radius:12px;font-weight:600;font-size:13.5px;cursor:pointer}
+  .no{flex:none;background:#fff;color:var(--soft);border:1px solid var(--line);padding:10px 16px;border-radius:12px;font-weight:600;font-size:13.5px;cursor:pointer}
+  .app-bottom{height:18px}
+
+  /* three promises */
+  .promises{padding:60px 0 30px}
+  .promises h2{text-align:center;font-size:clamp(26px,3.6vw,34px);letter-spacing:-.02em;margin-bottom:8px}
+  .promises .lead{text-align:center;color:var(--soft);max-width:42ch;margin:0 auto 40px}
+  .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+  .pcard{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:26px 22px}
+  .pcard .emoji{font-size:26px}
+  .pcard h3{font-size:18px;margin:14px 0 6px;letter-spacing:-.01em}
+  .pcard p{font-size:14.5px;color:var(--soft)}
+
+  /* story strip */
+  .story{margin:46px 0;background:#fff;border:1px solid var(--line);border-radius:24px;padding:36px 32px;display:grid;grid-template-columns:1fr 1fr;gap:30px;align-items:center}
+  .story .before,.story .after{padding:18px 20px;border-radius:16px}
+  .story .before{background:#fbecea;border:1px solid #f3d4cf}
+  .story .after{background:var(--green-soft);border:1px solid #cfe9da}
+  .story .tag{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px}
+  .story .before .tag{color:#c0503f}
+  .story .after .tag{color:var(--green)}
+  .story p{font-size:14.5px;color:var(--ink)}
+
+  /* final cta */
+  .final{text-align:center;padding:30px 0 80px}
+  .final h2{font-size:clamp(26px,3.8vw,36px);letter-spacing:-.02em;margin-bottom:12px}
+  .final p{color:var(--soft);margin-bottom:24px}
+  footer{text-align:center;padding:26px;color:var(--soft);font-size:13px;border-top:1px solid var(--line)}
+
+  @media(max-width:760px){
+    .cards{grid-template-columns:1fr}
+    .story{grid-template-columns:1fr}
+  }
+</style>
+</head>
+<body>
+
+  <nav>
+    <div class="logo"><span class="fork">🍴</span> Forky</div>
+    <button class="nav-cta">Probar gratis</button>
+  </nav>
+
+  <header class="hero wrap">
+    <span class="pill">Para restaurantes que cambian su menú seguido</span>
+    <h1>Un solo menú. <span class="hl">Siempre el correcto.</span></h1>
+    <p class="sub">Cambia precios y platillos sin miedo. Forky guarda cada cambio, y si algo sale mal vuelves al de ayer en un toque.</p>
+    <div class="cta-row">
+      <button class="btn-primary">Empezar gratis</button>
+      <button class="btn-ghost">Ver cómo funciona</button>
+    </div>
+    <p class="reassure">Sin tarjeta. Listo en 5 minutos.</p>
+  </header>
+
+  <!-- PHONE MOCKUP -->
+  <section class="stage">
+    <div class="phone">
+      <div class="screen">
+
+        <div class="app-top">
+          <div>
+            <div class="title">Tu menú</div>
+            <p class="sub">La Cocina de Lupita</p>
+          </div>
+          <div class="avatar">L</div>
+        </div>
+
+        <div class="live">
+          <div class="row">
+            <span class="badge-live"><span class="dot"></span> Lo que ve tu cliente ahora</span>
+          </div>
+          <h3>Menú de hoy · 17 jun</h3>
+          <p>42 platillos · precios al día · código QR activo</p>
+        </div>
+
+        <div class="section-label">Últimos cambios</div>
+        <div class="history">
+          <div class="item">
+            <div class="ic">💲</div>
+            <div class="body">
+              <div class="what">Subiste el precio de la torta ahogada a $95</div>
+              <div class="who">Tú · hace 10 min</div>
+            </div>
+            <button class="undo">Deshacer</button>
+          </div>
+          <div class="item">
+            <div class="ic">📷</div>
+            <div class="body">
+              <div class="what">Carlos cambió la foto de los tacos</div>
+              <div class="who">Diseñador · ayer</div>
+            </div>
+            <button class="undo">Deshacer</button>
+          </div>
+          <div class="item">
+            <div class="ic">🍲</div>
+            <div class="body">
+              <div class="what">Agregaste “Pozole de los viernes”</div>
+              <div class="who">Tú · viernes</div>
+            </div>
+            <button class="undo">Deshacer</button>
+          </div>
+        </div>
+
+        <div class="pending">
+          <span class="badge">⏳ Esperando tu OK</span>
+          <h4>Marketing quiere publicar la promo del 2x1</h4>
+          <p>Nadie lo verá hasta que tú lo apruebes.</p>
+          <div class="actions">
+            <button class="ok">Aprobar y publicar</button>
+            <button class="no">Ahora no</button>
+          </div>
+        </div>
+
+        <div class="app-bottom"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- THREE PROMISES -->
+  <section class="promises wrap">
+    <h2>Lo único que tienes que entender</h2>
+    <p class="lead">Nada de palabras raras. Tres cosas, y ya.</p>
+    <div class="cards">
+      <div class="pcard">
+        <div class="emoji">📋</div>
+        <h3>Un solo menú</h3>
+        <p>El bueno, el de hoy. Se acabaron las copias perdidas dando vueltas por WhatsApp.</p>
+      </div>
+      <div class="pcard">
+        <div class="emoji">↩️</div>
+        <h3>Todo se guarda</h3>
+        <p>¿Te equivocaste en un precio? Vuelves al menú de ayer con un toque. Sin dramas.</p>
+      </div>
+      <div class="pcard">
+        <div class="emoji">✅</div>
+        <h3>Tú das el OK</h3>
+        <p>Cualquiera propone un cambio, pero tu cliente solo ve lo que tú apruebas.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- STORY STRIP -->
+  <section class="wrap">
+    <div class="story">
+      <div class="before">
+        <div class="tag">Antes</div>
+        <p>El diseñador editó el archivo equivocado. El precio salió mal en el QR. Para cuando alguien lo notó, ya habían pasado decenas de clientes pagando de menos.</p>
+      </div>
+      <div class="after">
+        <div class="tag">Con Forky</div>
+        <p>El cambio quedó guardado con nombre y hora. En cuanto viste el error, tocaste “Deshacer” y el menú correcto volvió al instante.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FINAL CTA -->
+  <section class="final wrap">
+    <h2>Pruébalo este fin de semana</h2>
+    <p>Si no te ahorra un susto, lo dejas. Así de simple.</p>
+    <button class="btn-primary">Empezar gratis</button>
+  </section>
+
+  <footer>
+    Forky 🍴 · Hecho en Chihuahua, para todo México
+  </footer>
+
+</body>
+</html>
